@@ -28,14 +28,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-zen-bg">
       <header className="w-full p-6 border-b border-zen-border/30">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-zen-primary text-2xl font-semibold">Support Desk</h1>
+          <h1 className="text-zen-primary text-2xl font-semibold">Zen Gauntlet</h1>
           <div className="flex items-center gap-4">
             <span className="text-zen-secondary">
               {profile?.full_name} ({profile?.role || 'customer'})
             </span>
             <button 
               onClick={signOut} 
-              className="px-4 py-2 border border-zen-border/50 text-zen-primary hover:bg-white/20"
+              className="flex items-center gap-2 px-4 py-2 bg-zen-primary text-white hover:bg-zen-hover"
             >
               Sign Out
             </button>

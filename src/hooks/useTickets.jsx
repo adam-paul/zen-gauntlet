@@ -76,11 +76,25 @@ export function useTickets() {
     }
   }
 
+  async function deleteTicket(ticketId) {
+    try {
+      const { error } = await supabase
+        .from('tickets')
+        .delete()
+        .eq('id', ticketId);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error deleting ticket:', err);
+    }
+  }
+
   return { 
     tickets, 
     isLoading, 
     error, 
     createTicket,
+    deleteTicket,
     refresh: fetchTickets 
   };
 }

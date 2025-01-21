@@ -11,10 +11,18 @@ function PrivateRoute({ children }) {
   return user ? children : <Navigate to="/login" />;
 }
 
+function RootRedirect() {
+  const { user } = useAuth();
+  return <Navigate to={user ? "/dashboard" : "/login"} replace />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* Root route */}
+        <Route path="/" element={<RootRedirect />} />
+        
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         
@@ -28,8 +36,8 @@ export default function App() {
           }
         />
         
-        {/* Catch-all: redirect to /login */}
-        <Route path="*" element={<Navigate to="/login" />} />
+        {/* Catch-all: redirect to root for handling */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>
   );

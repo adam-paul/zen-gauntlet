@@ -17,6 +17,16 @@ function AuthStateManager({ children }) {
       return;
     }
 
+    // Check if session is valid before proceeding
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError || !user) {
+      await supabase.auth.signOut();
+      setSession(null);
+      setProfile(null);
+      navigate('/login');
+      return;
+    }
+
     setSession(session);
     navigate('/dashboard');
     
@@ -97,16 +107,12 @@ export function AuthProvider({ children }) {
     signIn: (data) => supabase.auth.signInWithPassword(data),
     signOut: async () => {
       try {
-        const { error } = await supabase.auth.signOut();
-        if (error) console.error('Error during sign out:', error.message);
-        // Force clean up the session state regardless of the API call result
+        await supabase.auth.signOut();
+      } catch (error) {
+        // Force cleanup even if the signOut fails
         setSession(null);
         setProfile(null);
-      } catch (err) {
-        console.error('Error during sign out:', err.message);
-        // Force clean up the session state even if the API call fails
-        setSession(null);
-        setProfile(null);
+        navigate('/login');
       }
     }
   };

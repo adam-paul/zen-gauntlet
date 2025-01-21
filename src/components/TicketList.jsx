@@ -1,39 +1,34 @@
 // src/components/TicketList.jsx
 
-import React from 'react';
-import { format } from 'date-fns';
+import { useTickets } from '../hooks/useTickets';
+import { Inbox } from 'lucide-react';
 
-export default function TicketList({ tickets, onTicketUpdated }) {
-  if (!tickets.length) {
-    return <p>No tickets found.</p>;
+export default function TicketList() {
+  const { tickets } = useTickets();
+
+  if (tickets.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Inbox className="mx-auto text-zen-primary/70 mb-4" size={48} />
+        <p className="text-zen-secondary">
+          No tickets yet. Create your first ticket to get started.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-md">
-      <ul className="divide-y divide-gray-200">
-        {tickets.map((ticket) => (
-          <li key={ticket.id}>
-            <div className="px-4 py-4 sm:px-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">{ticket.title}</h3>
-                <span className={`px-2 py-1 rounded-full text-sm font-semibold ${
-                  ticket.status === 'open' ? 'bg-green-100 text-green-800' :
-                  ticket.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {ticket.status}
-                </span>
-              </div>
-              <div className="mt-2">
-                <p className="text-sm text-gray-600">{ticket.description}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Created: {format(new Date(ticket.created_at), 'PPP')}
-                </p>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {tickets.map(ticket => (
+        <div key={ticket.id} className="bg-zen-bg p-6 border border-zen-border/30">
+          <h3 className="text-zen-primary font-medium mb-2">{ticket.title}</h3>
+          <p className="text-zen-secondary text-sm mb-4 line-clamp-3">{ticket.description}</p>
+          <div className="flex justify-between items-center text-sm text-zen-secondary">
+            <span className="uppercase">{ticket.status || 'open'}</span>
+            <span>{new Date(ticket.created_at).toLocaleDateString()}</span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

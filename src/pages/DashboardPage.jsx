@@ -1,55 +1,61 @@
 // src/pages/DashboardPage.jsx
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../config/supabaseClient';
+import { useAuth } from '../hooks/useAuth';
+import { useTickets } from '../hooks/useTickets';
+import TicketForm from '../components/TicketForm';
 import TicketList from '../components/TicketList';
-import CreateTicketForm from '../components/CreateTicketForm';
 
 export default function DashboardPage() {
-  const [tickets, setTickets] = useState([]);
-  const [ticketsLoading, setTicketsLoading] = useState(true);
-  const { user, profile, loading: authLoading, signOut } = useAuth();
+  const { profile, signOut } = useAuth();
+  const { tickets, isLoading, error } = useTickets();
 
-  useEffect(() => {
-    const fetchTickets = async () => {
-      let query = supabase.from('tickets').select('*');
-      if (profile?.role === 'customer') {
-        query = query.eq('created_by', user.id);
-      }
-      const { data } = await query;
-      setTickets(data || []);
-      setTicketsLoading(false);
-    };
-
-    if (user) fetchTickets();
-  }, [user, profile]);
-
-  if (authLoading || ticketsLoading) {
+  if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      <div className="min-h-screen bg-zen-bg">
+        <header className="w-full p-6 border-b border-zen-border/30">
+          <div className="max-w-6xl mx-auto">
+            <div className="bg-white/80 border border-zen-border/30 p-6 rounded">
+              <h3 className="text-zen-primary font-medium">Error loading tickets</h3>
+              <p className="text-zen-secondary mt-2">{error}</p>
+            </div>
+          </div>
+        </header>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">Support Dashboard</h1>
-          <button
-            onClick={signOut}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
-          >
-            Sign Out
-          </button>
+    <div className="min-h-screen bg-zen-bg">
+      <header className="w-full p-6 border-b border-zen-border/30">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <h1 className="text-zen-primary text-2xl font-semibold">Support Desk</h1>
+          <div className="flex items-center gap-4">
+            <span className="text-zen-secondary">
+              {profile?.full_name} ({profile?.role || 'customer'})
+            </span>
+            <button 
+              onClick={signOut} 
+              className="px-4 py-2 border border-zen-border/50 text-zen-primary hover:bg-white/20"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
-        {profile?.role === 'customer' && (
-          <CreateTicketForm onTicketCreated={() => window.location.reload()} />
-        )}
-      </div>
-      <TicketList tickets={tickets} onTicketUpdated={() => window.location.reload()} />
+      </header>
+
+      <main className="max-w-6xl mx-auto p-6">
+        <TicketForm />
+        
+        <div className="mt-8">
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin h-8 w-8 mx-auto border-4 border-zen-primary border-t-transparent rounded-full"></div>
+            </div>
+          ) : (
+            <TicketList tickets={tickets} />
+          )}
+        </div>
+      </main>
     </div>
   );
 }

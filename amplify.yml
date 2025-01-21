@@ -3,10 +3,13 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - npm ci --verbose
+        - npm list
     build:
       commands:
-        - npm run build
+        - echo "Starting build..."
+        - npm run build || { echo "Build failed"; exit 1; }
+        - echo "Build completed"
   artifacts:
     baseDirectory: dist
     files:
@@ -14,3 +17,5 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+    commands:
+      - echo "Cache paths configured"

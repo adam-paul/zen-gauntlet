@@ -95,7 +95,20 @@ export function AuthProvider({ children }) {
         }
       }),
     signIn: (data) => supabase.auth.signInWithPassword(data),
-    signOut: () => supabase.auth.signOut()
+    signOut: async () => {
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error('Error during sign out:', error.message);
+        // Force clean up the session state regardless of the API call result
+        setSession(null);
+        setProfile(null);
+      } catch (err) {
+        console.error('Error during sign out:', err.message);
+        // Force clean up the session state even if the API call fails
+        setSession(null);
+        setProfile(null);
+      }
+    }
   };
 
   return (

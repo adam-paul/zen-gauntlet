@@ -17,20 +17,9 @@ function AuthStateManager({ children }) {
       return;
     }
 
-    // Check if session is valid before proceeding
-    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
-    if (sessionError || !user) {
-      await supabase.auth.signOut();
-      setSession(null);
-      setProfile(null);
-      navigate('/login');
-      return;
-    }
-
     setSession(session);
-    navigate('/dashboard');
-    
-    // Get or create profile as a standard operation
+
+    // Fetch existing profile
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('*')
@@ -39,21 +28,12 @@ function AuthStateManager({ children }) {
       
     if (existingProfile) {
       setProfile(existingProfile);
-      return;
     }
-    
-    // No profile exists, create one
-    const { data: newProfile } = await supabase
-      .from('profiles')
-      .insert({
-        id: session.user.id,
-        role: 'customer',
-        full_name: session.user.user_metadata?.full_name
-      })
-      .select()
-      .single();
-      
-    if (newProfile) setProfile(newProfile);
+
+    // Navigate based on profile existence
+    if (existingProfile) {
+      navigate('/dashboard');
+    }
   }, [setSession, setProfile, navigate]);
 
   useEffect(() => {
@@ -95,12 +75,17 @@ export function AuthProvider({ children }) {
     setSession,
     profile,
     setProfile,
-    signUp: ({ email, password, fullName }) => 
+    signUp: ({ email, password, fullName, role, organizationName, organizationId }) => 
       supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: { 
+            full_name: fullName,
+            role,
+            organization_name: organizationName,
+            organization_id: organizationId
+          },
           emailRedirectTo: `${window.location.origin}/confirm`
         }
       }),

@@ -3,30 +3,34 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useOnboarding } from '../hooks/useOnboarding';
 
 export default function ConfirmPage() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { handleConfirmation } = useOnboarding();
 
   useEffect(() => {
-    // Supabase automatically handles the token from the URL hash
-    // We just need to wait for the auth state to update
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN') {
-        navigate('/login?confirmed=true', { replace: true });
+        try {
+          await handleConfirmation(session.user);
+        } catch (err) {
+          setError('Failed to complete onboarding. Please try again.');
+          navigate('/login', { replace: true });
+        }
       } else if (event === 'TOKEN_REFRESHED') {
         // Do nothing, wait for SIGNED_IN
       } else {
-        // If we get any other event, something went wrong
         setError('Verification failed. Please try again.');
         navigate('/login', { replace: true });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, handleConfirmation]);
 
   if (error) {
     return (

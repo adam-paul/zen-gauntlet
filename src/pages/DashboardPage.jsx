@@ -1,5 +1,6 @@
 // src/pages/DashboardPage.jsx
 
+import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTickets } from '../hooks/useTickets';
 import TicketForm from '../components/TicketForm';
@@ -8,6 +9,7 @@ import TicketList from '../components/TicketList';
 export default function DashboardPage() {
   const { profile, signOut } = useAuth();
   const { tickets, isLoading, error } = useTickets();
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   if (error) {
     return (
@@ -43,17 +45,22 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto p-6">
-        <TicketForm />
-        
-        <div className="mt-8">
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin h-8 w-8 mx-auto border-4 border-zen-primary border-t-transparent rounded-full"></div>
-            </div>
-          ) : (
-            <TicketList tickets={tickets} />
-          )}
+      <main className={`transition-all duration-300 ${selectedTicket ? 'pr-96' : ''}`}>
+        <div className="max-w-6xl mx-auto p-6">
+          <TicketForm />
+          
+          <div className="mt-8">
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin h-8 w-8 mx-auto border-4 border-zen-primary border-t-transparent rounded-full"></div>
+              </div>
+            ) : (
+              <TicketList 
+                selectedTicket={selectedTicket}
+                onSelectTicket={setSelectedTicket}
+              />
+            )}
+          </div>
         </div>
       </main>
     </div>

@@ -42,6 +42,15 @@ export default function CommentSection({ ticket, onClose }) {
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  if (e.shiftKey) {
+                    return; // Allow shift+enter for newline
+                  }
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
               placeholder={replyingTo ? "Write a reply..." : "Add a comment..."}
               className="w-full pr-10 border border-zen-border/50 rounded-md focus:outline-none focus:border-zen-primary focus:ring-1 focus:ring-zen-primary"
               rows="3"
@@ -65,7 +74,7 @@ function CommentThread({ comment, onReply }) {
       <div className="flex items-start gap-2">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-zen-primary">{comment.author.full_name}</span>
+            <span className="font-medium text-zen-primary">{comment.profile?.full_name || 'Deleted User'}</span>
             <span className="text-xs text-zen-secondary">
               {new Date(comment.created_at).toLocaleString()}
             </span>

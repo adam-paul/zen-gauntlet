@@ -1,6 +1,7 @@
 // src/hooks/useComments.js
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from './useAuth';
 
 const organizeComments = (comments) => {
   const map = new Map();
@@ -17,18 +18,27 @@ const organizeComments = (comments) => {
     }
   });
 
-  return roots.sort((a, b) => a.thread_position - b.thread_position);
+  return roots.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 };
 
 export function useComments(ticketId) {
+  const { profile } = useAuth();
   const [comments, setComments] = useState([]);
 
   const fetchComments = useCallback(async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('comments')
-      .select('*, author:profiles(id, full_name)')
+      .select(`
+        *,
+        profile:profiles(id, full_name)
+      `)
       .eq('ticket_id', ticketId)
       .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching comments:', error);
+      return;
+    }
 
     setComments(organizeComments(data || []));
   }, [ticketId]);
@@ -51,18 +61,33 @@ export function useComments(ticketId) {
   }, [ticketId, fetchComments]);
 
   const addComment = async (content, parentId = null) => {
-    const { data } = await supabase
+    if (!profile) {
+      console.error('User profile not found. Cannot add comment.');
+      return null;
+    }
+
+    const { data, error } = await supabase
       .from('comments')
       .insert({
         ticket_id: ticketId,
         content,
         parent_id: parentId,
+        user_id: profile.id,
         thread_position: parentId ? 
           (comments.find(c => c.id === parentId)?.replies.length || 0) : 0
       })
-      .select('*, author:profiles(id, full_name)');
+      .select(`
+        *,
+        profile:profiles(id, full_name)
+      `)
+      .single();
 
-    return data?.[0];
+    if (error) {
+      console.error('Error adding comment:', error);
+      return null;
+    }
+
+    return data;
   };
 
   return { comments, addComment, fetchComments };

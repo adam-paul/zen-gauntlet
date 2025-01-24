@@ -3,21 +3,25 @@
 import { useState } from 'react';
 import { useTickets } from '../hooks/useTickets';
 import { PlusSquare } from 'lucide-react';
+import TagInput from './TagInput';
 
 export default function TicketForm({ organizationId }) {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [tags, setTags] = useState([]);
   const { createTicket } = useTickets(organizationId);
 
   async function handleSubmit(e) {
     e.preventDefault();
     await createTicket({ 
       title, 
-      description
+      description,
+      tags
     });
     setTitle('');
     setDescription('');
+    setTags([]);
     setShowForm(false);
   }
 
@@ -58,6 +62,16 @@ export default function TicketForm({ organizationId }) {
           onChange={(e) => setDescription(e.target.value)}
           required
           className="w-full p-2 border border-zen-border/50 bg-white/80 h-32 focus:outline-none focus:border-zen-primary"
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="block text-zen-secondary font-medium">
+          Tags
+        </label>
+        <TagInput
+          tags={tags}
+          onChange={setTags}
+          className="bg-white/80"
         />
       </div>
       <div className="flex justify-end gap-4">

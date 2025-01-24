@@ -60,7 +60,7 @@ export function useTickets(organizationId) {
     return () => supabase.removeChannel(channel);
   }, [session?.user?.id, organizationId]);
 
-  async function createTicket({ title, description }) {
+  async function createTicket({ title, description, tags }) {
     if (!organizationId) {
       throw new Error('Organization ID is required to create a ticket');
     }
@@ -71,6 +71,7 @@ export function useTickets(organizationId) {
         .insert({
           title,
           description,
+          tags: tags || [],
           created_by: session.user.id,
           status: 'open',
           organization_id: organizationId
@@ -205,12 +206,176 @@ export function useTickets(organizationId) {
     }
   }
 
+  async function updateTags(ticketId, newTags) {
+    const currentRole = getCurrentRole();
+    if (!currentRole || !['admin', 'agent'].includes(currentRole)) {
+      return { error: new Error('Insufficient permissions to update tags') };
+    }
+
+    try {
+      const ticketToUpdate = tickets.find(t => t.id === ticketId);
+      if (!ticketToUpdate) {
+        throw new Error('Ticket not found');
+      }
+
+      // Store old tags for rollback
+      const oldTags = ticketToUpdate.tags || [];
+
+      // Optimistically update the UI
+      setTickets(prevTickets =>
+        prevTickets.map(ticket =>
+          ticket.id === ticketId
+            ? { ...ticket, tags: newTags }
+            : ticket
+        )
+      );
+
+      // Perform the actual update
+      const { error } = await supabase
+        .from('tickets')
+        .update({ tags: newTags })
+        .eq('id', ticketId);
+
+      if (error) {
+        // Rollback on error
+        setTickets(prevTickets =>
+          prevTickets.map(ticket =>
+            ticket.id === ticketId
+              ? { ...ticket, tags: oldTags }
+              : ticket
+          )
+        );
+        throw error;
+      }
+
+      return { error: null };
+    } catch (err) {
+      console.error('Error updating tags:', err);
+      return { error: err };
+    }
+  }
+
+  async function addTag(ticketId, tag) {
+    const currentRole = getCurrentRole();
+    if (!currentRole || !['admin', 'agent'].includes(currentRole)) {
+      return { error: new Error('Insufficient permissions to add tags') };
+    }
+
+    try {
+      const ticketToUpdate = tickets.find(t => t.id === ticketId);
+      if (!ticketToUpdate) {
+        throw new Error('Ticket not found');
+      }
+
+      const currentTags = ticketToUpdate.tags || [];
+      if (currentTags.includes(tag)) {
+        return { error: null }; // Tag already exists
+      }
+
+      // Check tag limit
+      if (currentTags.length >= 5) {
+        return { error: new Error('Maximum of 5 tags allowed') };
+      }
+
+      const newTags = [...currentTags, tag];
+      
+      // Optimistically update UI
+      setTickets(prevTickets =>
+        prevTickets.map(ticket =>
+          ticket.id === ticketId
+            ? { ...ticket, tags: newTags }
+            : ticket
+        )
+      );
+
+      // Perform the actual update
+      const { error } = await supabase
+        .from('tickets')
+        .update({ tags: newTags })
+        .eq('id', ticketId);
+
+      if (error) {
+        // Rollback on error
+        setTickets(prevTickets =>
+          prevTickets.map(ticket =>
+            ticket.id === ticketId
+              ? { ...ticket, tags: currentTags }
+              : ticket
+          )
+        );
+        throw error;
+      }
+
+      return { error: null };
+    } catch (err) {
+      console.error('Error adding tag:', err);
+      return { error: err };
+    }
+  }
+
+  async function removeTag(ticketId, tagToRemove) {
+    const currentRole = getCurrentRole();
+    if (!currentRole || !['admin', 'agent'].includes(currentRole)) {
+      return { error: new Error('Insufficient permissions to remove tags') };
+    }
+
+    try {
+      const ticketToUpdate = tickets.find(t => t.id === ticketId);
+      if (!ticketToUpdate) {
+        throw new Error('Ticket not found');
+      }
+
+      const currentTags = ticketToUpdate.tags || [];
+      const newTags = currentTags.filter(tag => tag !== tagToRemove);
+      
+      if (newTags.length === currentTags.length) {
+        return { error: null }; // Tag didn't exist
+      }
+
+      // Optimistically update UI
+      setTickets(prevTickets =>
+        prevTickets.map(ticket =>
+          ticket.id === ticketId
+            ? { ...ticket, tags: newTags }
+            : ticket
+        )
+      );
+
+      // Perform the actual update
+      const { error } = await supabase
+        .from('tickets')
+        .update({ tags: newTags })
+        .eq('id', ticketId);
+
+      if (error) {
+        // Rollback on error
+        setTickets(prevTickets =>
+          prevTickets.map(ticket =>
+            ticket.id === ticketId
+              ? { ...ticket, tags: currentTags }
+              : ticket
+          )
+        );
+        throw error;
+      }
+
+      return { error: null };
+    } catch (err) {
+      console.error('Error removing tag:', err);
+      return { error: err };
+    }
+  }
+
   return {
     tickets,
     error,
     createTicket,
     deleteTicket,
     updateTicketStatus,
-    updateDifficulty
+    updateDifficulty,
+    updateTags,
+    addTag,
+    removeTag,
+    setTickets
   };
 }

@@ -14,7 +14,13 @@ import NotificationDropdown from '../components/NotificationDropdown';
 export default function DashboardPage() {
   const { session, setCurrentOrganizationId, memberships, getCurrentOrganization, signOut, setMemberships } = useAuth();
   const selectedOrg = getCurrentOrganization();
-  const { tickets, isLoading, deleteTicket: deleteTicketFromHook } = useTickets(selectedOrg?.id);
+  const { 
+    tickets, 
+    isLoading, 
+    deleteTicket: deleteTicketFromHook, 
+    addTag,
+    removeTag
+  } = useTickets(selectedOrg?.id);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [showOrgForm, setShowOrgForm] = useState(false);
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
@@ -271,6 +277,8 @@ export default function DashboardPage() {
                     selectedTicket={selectedTicket}
                     onSelectTicket={setSelectedTicket}
                     onDeleteTicket={deleteTicket}
+                    addTag={addTag}
+                    removeTag={removeTag}
                   />
                 )}
               </div>

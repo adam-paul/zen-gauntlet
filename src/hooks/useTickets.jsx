@@ -66,20 +66,36 @@ export function useTickets(organizationId) {
     }
 
     try {
+      // Create new ticket object with default values
+      const newTicket = {
+        title,
+        description,
+        tags: tags || [],
+        created_by: session.user.id,
+        status: 'open',
+        organization_id: organizationId,
+        created_at: new Date().toISOString(),
+        difficulty: null
+      };
+
+      // Optimistically update UI
+      setTickets(prevTickets => [newTicket, ...prevTickets]);
+
       const { data, error } = await supabase
         .from('tickets')
-        .insert({
-          title,
-          description,
-          tags: tags || [],
-          created_by: session.user.id,
-          status: 'open',
-          organization_id: organizationId
-        })
+        .insert(newTicket)
         .select()
         .single();
   
-      if (error) throw error;
+      if (error) {
+        // Rollback on error
+        setTickets(prevTickets => prevTickets.slice(1)); // Remove optimistic ticket
+        throw error;
+      }
+
+      // Update with real server data
+      setTickets(prevTickets => [data, ...prevTickets.slice(1)]);
+
       return { data, error: null };
     } catch (err) {
       console.error('Error creating ticket:', err);
@@ -89,12 +105,26 @@ export function useTickets(organizationId) {
 
   async function deleteTicket(ticketId) {
     try {
+      // Store ticket for potential rollback
+      const ticketToDelete = tickets.find(t => t.id === ticketId);
+      if (!ticketToDelete) {
+        throw new Error('Ticket not found');
+      }
+
+      // Optimistically update UI
+      setTickets(prevTickets => prevTickets.filter(t => t.id !== ticketId));
+
       const { error } = await supabase
         .from('tickets')
         .delete()
         .eq('id', ticketId);
 
-      if (error) throw error;
+      if (error) {
+        // Rollback on error
+        setTickets(prevTickets => [...prevTickets, ticketToDelete]);
+        throw error;
+      }
+
       return { error: null };
     } catch (err) {
       console.error('Error deleting ticket:', err);

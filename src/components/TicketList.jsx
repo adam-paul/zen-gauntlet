@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Inbox, X } from 'lucide-react';
 import RankButton from './RankButton';
 import CommentSection from './CommentSection';
+import StatusDropdown from './StatusDropdown';
 
 export default function TicketList({ selectedTicket, onSelectTicket, tickets, onDeleteTicket }) {
   const { session, getCurrentRole } = useAuth();
@@ -51,11 +52,19 @@ export default function TicketList({ selectedTicket, onSelectTicket, tickets, on
 
           <div className="flex flex-col gap-2">
             <div className="flex justify-start">
-              <RankButton ticketId={ticket.id} currentDifficulty={ticket.difficulty} />
+              <RankButton 
+                ticketId={ticket.id} 
+                currentDifficulty={ticket.difficulty}
+                organizationId={ticket.organization_id}
+              />
             </div>
             
             <div className="flex justify-between items-center text-sm text-zen-secondary">
-              <span className="uppercase">{ticket.status || 'open'}</span>
+              <StatusDropdown
+                ticketId={ticket.id}
+                currentStatus={ticket.status}
+                organizationId={ticket.organization_id}
+              />
               {/* Chat icon button */}
               <button
                 onClick={() => onSelectTicket(selectedTicket?.id === ticket.id ? null : ticket)}

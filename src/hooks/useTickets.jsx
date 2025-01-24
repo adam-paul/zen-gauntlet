@@ -4,19 +4,42 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 
-export function useTickets() {
+export function useTickets(organizationId) {
   const [tickets, setTickets] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { session } = useAuth();
 
+  async function fetchTickets() {
+    if (!organizationId) {
+      setTickets([]);
+      return;
+    }
+
+    try {
+      setError(null);
+      
+      const { data, error: fetchError } = await supabase
+        .from('tickets')
+        .select('*')
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+        
+      if (fetchError) throw fetchError;
+      setTickets(data || []);
+    } catch (err) {
+      console.error('Error fetching tickets:', err);
+      setError(err.message);
+    } 
+  }
+
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id || !organizationId) {
+      setTickets([]);
+      return;
+    }
     
-    // Initial fetch
     fetchTickets();
 
-    // Set up realtime subscription
     const channel = supabase
       .channel('tickets')
       .on(
@@ -24,38 +47,21 @@ export function useTickets() {
         {
           event: '*',
           schema: 'public',
-          table: 'tickets'
+          table: 'tickets',
+          filter: `organization_id=eq.${organizationId}`
         },
         () => fetchTickets()
       )
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [session?.user?.id]);
-
-  async function fetchTickets() {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const { data, error: fetchError } = await supabase
-        .from('tickets')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (fetchError) throw fetchError;
-      setTickets(data || []);
-    } catch (err) {
-      console.error('Error fetching tickets:', err);
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    return () => supabase.removeChannel(channel);
+  }, [session?.user?.id, organizationId]);
 
   async function createTicket({ title, description }) {
+    if (!organizationId) {
+      throw new Error('Organization ID is required to create a ticket');
+    }
+
     try {
       const { data, error } = await supabase
         .from('tickets')
@@ -63,11 +69,12 @@ export function useTickets() {
           title,
           description,
           created_by: session.user.id,
-          status: 'open'
+          status: 'open',
+          organization_id: organizationId
         })
         .select()
         .single();
-
+  
       if (error) throw error;
       return { data, error: null };
     } catch (err) {
@@ -84,17 +91,17 @@ export function useTickets() {
         .eq('id', ticketId);
 
       if (error) throw error;
+      return { error: null };
     } catch (err) {
       console.error('Error deleting ticket:', err);
+      return { error: err };
     }
   }
 
-  return { 
-    tickets, 
-    isLoading, 
-    error, 
+  return {
+    tickets,
+    error,
     createTicket,
-    deleteTicket,
-    refresh: fetchTickets 
+    deleteTicket
   };
 }

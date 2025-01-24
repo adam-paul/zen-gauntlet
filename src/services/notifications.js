@@ -1,25 +1,32 @@
 // src/services/notifications.js
+
 import { supabase } from '../lib/supabase';
 
 export const notificationService = {
-  async createWebhookEndpoint(url, events) {
-    const { data } = await supabase
-      .from('webhooks')
-      .insert({ url, events });
-    return data;
+  async getNotifications(userId) {
+    return supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
   },
 
-  async triggerWebhook(event, payload) {
-    const { data } = await supabase
-      .from('webhooks')
-      .select('url')
-      .contains('events', [event]);
-    
-    data.forEach(({ url }) => {
-      fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      });
-    });
+  async markAsRead(notificationId) {
+    return supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', notificationId);
+  },
+
+  subscribeToUpdates(userId, callback) {
+    return supabase
+      .channel('notifications')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${userId}`
+      }, payload => callback(payload))
+      .subscribe();
   }
 };

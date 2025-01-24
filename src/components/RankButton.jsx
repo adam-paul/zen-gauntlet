@@ -8,10 +8,10 @@ const DIFFICULTY_COLORS = {
 };
 
 export default function RankButton({ ticketId, currentDifficulty }) {
-  const { profile } = useAuth();
+  const { getCurrentRole } = useAuth();
+  const currentRole = getCurrentRole();
   
-  // Early return if not admin - don't even render the container
-  if (profile?.role !== 'admin') return null;
+  if (currentRole !== 'admin') return null;
 
   async function updateDifficulty(difficulty) {
     // If clicking the same difficulty, set to null (deselect)

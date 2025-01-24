@@ -1,21 +1,20 @@
 // src/components/TicketList.jsx
 
 import { useState } from 'react';
-import { useTickets } from '../hooks/useTickets';
 import { useAuth } from '../hooks/useAuth';
 import { Inbox, X } from 'lucide-react';
 import RankButton from './RankButton';
 import CommentSection from './CommentSection';
 
-export default function TicketList({ selectedTicket, onSelectTicket }) {
-  const { tickets, deleteTicket } = useTickets();
-  const { session, profile } = useAuth();
+export default function TicketList({ selectedTicket, onSelectTicket, tickets, onDeleteTicket }) {
+  const { session, getCurrentRole } = useAuth();
 
   const canDeleteTicket = (ticket) => {
-    return profile?.role === 'admin' || ticket.created_by === session?.user?.id;
+    const currentRole = getCurrentRole();
+    return currentRole === 'admin' || ticket.created_by === session?.user?.id;
   };
 
-  if (tickets.length === 0) {
+  if (!tickets?.length) {
     return (
       <div className="text-center py-12">
         <Inbox className="mx-auto text-zen-primary/70 mb-4" size={48} />
@@ -32,7 +31,7 @@ export default function TicketList({ selectedTicket, onSelectTicket }) {
         <div key={ticket.id} className="bg-zen-bg p-6 border border-zen-border/30 relative">
           {canDeleteTicket(ticket) && (
             <button
-              onClick={() => deleteTicket(ticket.id)}
+              onClick={() => onDeleteTicket(ticket.id)}
               className="absolute top-2 right-2 text-zen-secondary hover:text-zen-primary transition-colors"
               aria-label="Delete ticket"
             >

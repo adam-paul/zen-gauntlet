@@ -8,33 +8,41 @@ const AuthContext = createContext(null);
 
 function AuthStateManager({ children }) {
   const navigate = useNavigate();
-  const { setSession, setProfile } = useContext(AuthContext);
+  const { setSession, setProfile, setMemberships: setAuthMemberships, setCurrentOrganizationId } = useContext(AuthContext);
 
   const handleSession = useCallback(async (session) => {
     if (!session) {
       setSession(null);
       setProfile(null);
+      setAuthMemberships([]);
+      setCurrentOrganizationId(null);
       return;
     }
-
+  
     setSession(session);
-
-    // Fetch existing profile
+  
+    // Fetch profile and memberships
     const { data: existingProfile } = await supabase
       .from('profiles')
-      .select('*')
+      .select('full_name, avatar_url')
       .eq('id', session.user.id)
       .maybeSingle();
-      
-    if (existingProfile) {
-      setProfile(existingProfile);
+  
+    const { data: memberships } = await supabase
+      .from('user_organization_memberships')
+      .select('*, organization:organizations(*)')
+      .eq('user_id', session.user.id);
+  
+    setAuthMemberships(memberships || []);
+    setProfile(existingProfile);
+    
+    // Set initial organization if available
+    if (memberships?.[0]) {
+      setCurrentOrganizationId(memberships[0].organization_id);
     }
-
-    // Navigate based on profile existence
-    if (existingProfile) {
-      navigate('/dashboard');
-    }
-  }, [setSession, setProfile, navigate]);
+  
+    navigate('/dashboard');
+  }, [setSession, setProfile, setAuthMemberships, setCurrentOrganizationId, navigate]);
 
   useEffect(() => {
     let mounted = true;
@@ -69,12 +77,28 @@ function AuthStateManager({ children }) {
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [memberships, setMemberships] = useState([]);
+  const [currentOrganizationId, setCurrentOrganizationId] = useState(null);
 
   const value = {
     session,
     setSession,
     profile,
     setProfile,
+    memberships,
+    setMemberships,
+    currentOrganizationId,
+    setCurrentOrganizationId,
+    getCurrentRole: () => {
+      if (!currentOrganizationId) return null;
+      const membership = memberships.find(m => m.organization_id === currentOrganizationId);
+      return membership?.user_role;
+    },
+    getCurrentOrganization: () => {
+      if (!currentOrganizationId) return null;
+      const membership = memberships.find(m => m.organization_id === currentOrganizationId);
+      return membership?.organization;
+    },
     signUp: ({ email, password, fullName, role, organizationName, organizationId }) => 
       supabase.auth.signUp({
         email,

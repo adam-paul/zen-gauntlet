@@ -1,4 +1,5 @@
-// src/hooks/useComments.js
+// src/hooks/useComments.jsx
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
@@ -22,7 +23,7 @@ const organizeComments = (comments) => {
 };
 
 export function useComments(ticketId) {
-  const { profile } = useAuth();
+  const { session } = useAuth();
   const [comments, setComments] = useState([]);
 
   const fetchComments = useCallback(async () => {
@@ -61,8 +62,8 @@ export function useComments(ticketId) {
   }, [ticketId, fetchComments]);
 
   const addComment = async (content, parentId = null) => {
-    if (!profile) {
-      console.error('User profile not found. Cannot add comment.');
+    if (!session?.user?.id) {
+      console.error('User not authenticated. Cannot add comment.');
       return null;
     }
 
@@ -72,7 +73,7 @@ export function useComments(ticketId) {
         ticket_id: ticketId,
         content,
         parent_id: parentId,
-        user_id: profile.id,
+        user_id: session.user.id,
         thread_position: parentId ? 
           (comments.find(c => c.id === parentId)?.replies.length || 0) : 0
       })

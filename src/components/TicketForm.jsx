@@ -4,15 +4,18 @@ import { useState } from 'react';
 import { useTickets } from '../hooks/useTickets';
 import { PlusSquare } from 'lucide-react';
 
-export default function TicketForm() {
+export default function TicketForm({ organizationId }) {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const { createTicket } = useTickets();
+  const { createTicket } = useTickets(organizationId);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await createTicket({ title, description });
+    await createTicket({ 
+      title, 
+      description
+    });
     setTitle('');
     setDescription('');
     setShowForm(false);

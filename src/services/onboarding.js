@@ -24,25 +24,49 @@ export const onboardingService = {
     }
   },
 
+  // Updated createProfile function
   async createProfile(user) {
     try {
       const metadata = user.user_metadata;
       let organizationId = metadata?.organization_id;
 
-      // If admin role, create new organization
+      // Create organization and membership for admins
       if (metadata?.role === 'admin' && metadata?.organization_name) {
         const { organization, error } = await this.createOrganization(metadata.organization_name);
         if (error) throw error;
+        
+        // Create admin membership
+        const { error: membershipError } = await supabase
+          .from('user_organization_memberships')
+          .insert({
+            user_id: user.id,
+            organization_id: organization.id,
+            user_role: 'admin'
+          });
+        if (membershipError) throw membershipError;
+        
         organizationId = organization.id;
       }
+      // Create membership for customers who selected an organization
+      else if (metadata?.role === 'customer' && metadata?.organization_id) {
+        const { error: membershipError } = await supabase
+          .from('user_organization_memberships')
+          .insert({
+            user_id: user.id,
+            organization_id: metadata.organization_id,
+            user_role: 'customer'
+          });
+        if (membershipError) throw membershipError;
+        
+        organizationId = metadata.organization_id;
+      }
 
+      // Create profile without organization_id or role
       const { data: profile, error } = await supabase
         .from('profiles')
         .insert({
           id: user.id,
-          role: metadata?.role || 'customer',
-          full_name: metadata?.full_name,
-          organization_id: organizationId
+          full_name: metadata?.full_name
         })
         .select()
         .single();

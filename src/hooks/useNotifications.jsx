@@ -8,39 +8,52 @@ export function useNotifications() {
   const { session } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Load initial notifications and setup subscription
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    const loadInitial = async () => {
-      const { data } = await notificationService.getNotifications(session.user.id);
-      setNotifications(data || []);
-      updateUnreadCount(data || []);
+    const loadNotifications = async () => {
+      setIsLoading(true);
+      const { data, error } = await notificationService.getNotifications(session.user.id);
+      if (!error) {
+        setNotifications(data || []);
+        setUnreadCount((data || []).filter(n => !n.read).length);
+      }
+      setIsLoading(false);
     };
 
+    // Setup real-time subscription
     const subscription = notificationService.subscribeToUpdates(
       session.user.id,
       (payload) => {
-        setNotifications(prev => [payload.new, ...prev]);
-        if (!payload.new.read) setUnreadCount(c => c + 1);
+        if (payload.eventType === 'INSERT') {
+          setNotifications(prev => [payload.new, ...prev]);
+          if (!payload.new.read) setUnreadCount(c => c + 1);
+        }
       }
     );
 
-    loadInitial();
+    loadNotifications();
     return () => subscription.unsubscribe();
   }, [session?.user?.id]);
 
-  const updateUnreadCount = (notifs) => {
-    setUnreadCount(notifs.filter(n => !n.read).length);
-  };
-
+  // Mark single notification as read
   const markAsRead = async (id) => {
-    await notificationService.markAsRead(id);
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? {...n, read: true} : n)
-    );
-    setUnreadCount(c => c - 1);
+    const { error } = await notificationService.markAsRead(id);
+    if (!error) {
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? {...n, read: true} : n)
+      );
+      setUnreadCount(c => Math.max(0, c - 1));
+    }
   };
 
-  return { notifications, unreadCount, markAsRead };
+  return {
+    notifications,
+    unreadCount,
+    isLoading,
+    markAsRead
+  };
 }

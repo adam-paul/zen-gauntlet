@@ -10,5 +10,5 @@ SET search_path = public
 AS $$
   SELECT id, name 
   FROM organizations 
-  ORDER BY name;
+  ORDER BY created_at DESC;
 $$; 

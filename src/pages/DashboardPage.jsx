@@ -38,7 +38,7 @@ export default function DashboardPage() {
       const { data } = await supabase
         .from('organizations')
         .select('*')
-        .order('name');
+        .order('created_at', { ascending: false });
       
       // Filter out organizations user is already a member of
       const memberOrgIds = new Set(memberships.map(m => m.organization_id));

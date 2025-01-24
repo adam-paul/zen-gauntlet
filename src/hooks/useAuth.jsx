@@ -16,6 +16,7 @@ function AuthStateManager({ children }) {
       setProfile(null);
       setAuthMemberships([]);
       setCurrentOrganizationId(null);
+      localStorage.removeItem('lastSelectedOrgId');
       return;
     }
   
@@ -31,14 +32,16 @@ function AuthStateManager({ children }) {
     const { data: memberships } = await supabase
       .from('user_organization_memberships')
       .select('*, organization:organizations(*)')
-      .eq('user_id', session.user.id);
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
   
     setAuthMemberships(memberships || []);
     setProfile(existingProfile);
     
-    // Set initial organization if available
-    if (memberships?.[0]) {
-      setCurrentOrganizationId(memberships[0].organization_id);
+    // Try to restore last selected organization
+    const lastSelectedOrgId = localStorage.getItem('lastSelectedOrgId');
+    if (lastSelectedOrgId && memberships?.some(m => m.organization_id === lastSelectedOrgId)) {
+      setCurrentOrganizationId(lastSelectedOrgId);
     }
   
     navigate('/dashboard');
@@ -78,7 +81,17 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [memberships, setMemberships] = useState([]);
-  const [currentOrganizationId, setCurrentOrganizationId] = useState(null);
+  const [currentOrganizationId, _setCurrentOrganizationId] = useState(null);
+
+  // Wrap setCurrentOrganizationId to persist to localStorage
+  const setCurrentOrganizationId = useCallback((orgId) => {
+    _setCurrentOrganizationId(orgId);
+    if (orgId) {
+      localStorage.setItem('lastSelectedOrgId', orgId);
+    } else {
+      localStorage.removeItem('lastSelectedOrgId');
+    }
+  }, []);
 
   const value = {
     session,

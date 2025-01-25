@@ -43,8 +43,11 @@ export function useTickets(organizationId) {
     
     fetchTickets();
 
+    // Create a unique channel name for the subscription (to avoid conflict with function subscriptions)
+    const channelName = `tickets-${organizationId}-${Date.now()}`;
+    
     const channel = supabase
-      .channel('tickets')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -55,9 +58,13 @@ export function useTickets(organizationId) {
         },
         () => fetchTickets()
       )
-      .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    // Subscribe and log status
+    channel.subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [session?.user?.id, organizationId]);
 
   async function createTicket({ title, description, tags }) {

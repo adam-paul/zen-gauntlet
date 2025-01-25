@@ -1,7 +1,6 @@
 // src/components/AuthForm.jsx
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LoadingButton from './LoadingButton';
 import { supabase } from '../lib/supabase';
@@ -17,7 +16,6 @@ export default function AuthForm({ mode = 'signIn' }) {
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
-  const navigate = useNavigate();
 
   // Fetch existing organizations on mount for customer signup
   useEffect(() => {

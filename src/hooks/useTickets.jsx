@@ -56,7 +56,28 @@ export function useTickets(organizationId) {
           table: 'tickets',
           filter: `organization_id=eq.${organizationId}`
         },
-        () => fetchTickets()
+        (payload) => {
+          // Handle different types of changes
+          switch (payload.eventType) {
+            case 'UPDATE':
+              setTickets(prevTickets =>
+                prevTickets.map(ticket =>
+                  ticket.id === payload.new.id ? { ...ticket, ...payload.new } : ticket
+                )
+              );
+              break;
+            case 'INSERT':
+              setTickets(prevTickets => [payload.new, ...prevTickets]);
+              break;
+            case 'DELETE':
+              setTickets(prevTickets => 
+                prevTickets.filter(ticket => ticket.id !== payload.old.id)
+              );
+              break;
+            default:
+              fetchTickets(); // Fallback to full fetch for unknown events
+          }
+        }
       )
 
     // Subscribe and log status
@@ -218,7 +239,7 @@ export function useTickets(organizationId) {
         )
       );
 
-      // Perform the actual update
+      // Perform the update
       const { error } = await supabase
         .from('tickets')
         .update({ difficulty: newDifficulty })

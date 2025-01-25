@@ -5,6 +5,7 @@ import StatusDropdown from './StatusDropdown';
 import TicketTags from './TicketTags';
 import { formatTimeAgo } from '../utils/DatetimeUtils';
 import { useEscapeKey } from '../utils/EventHandlers';
+import { useTickets } from '../hooks/useTickets';
 
 export default function TicketModal({ 
   ticket,
@@ -16,6 +17,10 @@ export default function TicketModal({
   removeTag
 }) {
   useEscapeKey(onClose);
+  const { tickets } = useTickets(ticket?.organization_id);
+  
+  // Find the latest ticket data from global state
+  const currentTicket = tickets.find(t => t.id === ticket?.id) || ticket;
 
   if (!isOpen) return null;
 
@@ -34,28 +39,36 @@ export default function TicketModal({
             <div className="flex-1">
               <div className="flex items-start gap-4">
                 <h2 className="text-2xl font-semibold text-zen-primary">
-                  {ticket.title}
+                  {currentTicket.title}
                 </h2>
                 <TicketTags
-                  ticketId={ticket.id}
-                  initialTags={ticket.tags || []}
+                  ticketId={currentTicket.id}
+                  initialTags={currentTicket.tags || []}
                   onAddTag={addTag}
                   onRemoveTag={removeTag}
                   className="mt-1"
                 />
               </div>
               <p className="text-sm text-zen-secondary mt-2">
-                Created {new Date(ticket.created_at).toLocaleString()} ({formatTimeAgo(ticket.created_at)})
+                Created {new Date(currentTicket.created_at).toLocaleString()} ({formatTimeAgo(currentTicket.created_at)})
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <StatusDropdown ticket={ticket} />
-              <RankButton ticket={ticket} />
+              <StatusDropdown
+                ticketId={currentTicket.id}
+                currentStatus={currentTicket.status}
+                organizationId={currentTicket.organization_id}
+              />
+              <RankButton
+                ticketId={currentTicket.id}
+                currentDifficulty={currentTicket.difficulty}
+                organizationId={currentTicket.organization_id}
+              />
             </div>
           </div>
 
           <p className="text-zen-primary mb-6 text-lg">
-            {ticket.description}
+            {currentTicket.description}
           </p>
         </div>
 

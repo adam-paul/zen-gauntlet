@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import AuthForm from '../components/AuthForm';
 import { getTimeOfDay } from '../utils/DatetimeUtils';
+import AuthForm from '../components/AuthForm';
+
 
 export default function LoginPage() {
   const [mode, setMode] = useState('signIn');

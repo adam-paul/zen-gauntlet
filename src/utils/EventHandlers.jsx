@@ -41,4 +41,4 @@ export function useClickAway(ref, callback) {
 export function useDropdown(ref, onClose) {
   useEscapeKey(onClose);
   useClickAway(ref, onClose);
-} 
+}

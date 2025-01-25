@@ -1,0 +1,6 @@
+[global]
+environment_variables = ["OPENAI_API_KEY"]
+
+[deploy]
+max_retries = 3
+timeout_ms = 15000 

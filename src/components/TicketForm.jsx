@@ -49,7 +49,7 @@ export default function TicketForm({ organizationId }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full p-2 border border-zen-border/50 bg-white/80 focus:outline-none focus:border-zen-primary"
+          className="w-full p-2 border border-zen-border/50 bg-white/80 focus:outline-none focus:border-zen-primary bg-[url('/input-texture.svg')] bg-no-repeat bg-right-bottom"
         />
       </div>
       <div className="space-y-2">
@@ -61,7 +61,7 @@ export default function TicketForm({ organizationId }) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
-          className="w-full p-2 border border-zen-border/50 bg-white/80 h-32 focus:outline-none focus:border-zen-primary"
+          className="w-full p-2 border border-zen-border/50 bg-white/80 h-32 focus:outline-none focus:border-zen-primary bg-[url('/input-texture.svg')] bg-no-repeat bg-right-bottom"
         />
       </div>
       <div className="space-y-2">
@@ -71,7 +71,8 @@ export default function TicketForm({ organizationId }) {
         <TagInput
           tags={tags}
           onChange={setTags}
-          className="bg-white/80"
+          className="bg-white/80 bg-[url('/input-texture.svg')] bg-no-repeat bg-right-bottom"
+          description={description}
         />
       </div>
       <div className="flex justify-end gap-4">

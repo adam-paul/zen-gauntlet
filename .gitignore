@@ -3,3 +3,7 @@
 
 # Build management
 **/node_modules
+
+# Supabase
+**/.temp/
+**/_shared/

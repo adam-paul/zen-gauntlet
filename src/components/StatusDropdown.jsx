@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTickets } from '../hooks/useTickets';
 import { ChevronDown } from 'lucide-react';
+import { useDropdown } from '../utils/EventHandlers';
 
 const STATUS_COLORS = {
   open: 'bg-blue-100 hover:bg-blue-200 text-blue-800',
@@ -15,9 +16,12 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [localStatus, setLocalStatus] = useState(currentStatus);
+  const dropdownRef = useRef(null);
   const { getCurrentRole } = useAuth();
   const { updateTicketStatus } = useTickets(organizationId);
   const currentRole = getCurrentRole();
+
+  useDropdown(dropdownRef, () => setIsOpen(false));
 
   // Keep local status in sync with props
   useEffect(() => {
@@ -54,7 +58,7 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => !isUpdating && setIsOpen(!isOpen)}
         disabled={isUpdating}

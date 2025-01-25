@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Inbox, X, Plus } from 'lucide-react';
+import { Inbox, X } from 'lucide-react';
 import RankButton from './RankButton';
 import CommentSection from './CommentSection';
 import StatusDropdown from './StatusDropdown';
+import TicketModal from './TicketModal';
+import TicketTags from './TicketTags';
 
 export default function TicketList({ 
   selectedTicket, 
@@ -16,9 +18,7 @@ export default function TicketList({
   removeTag: removeTagFromHook
 }) {
   const { session, getCurrentRole } = useAuth();
-  const [showTagInput, setShowTagInput] = useState(null);
-  const [newTag, setNewTag] = useState('');
-  const [tagError, setTagError] = useState(null);
+  const [modalTicket, setModalTicket] = useState(null);
 
   const canDeleteTicket = (ticket) => {
     const currentRole = getCurrentRole();
@@ -53,7 +53,15 @@ export default function TicketList({
           <div className="flex-1">
             {/* Header */}
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-zen-primary font-medium">{ticket.title}</h3>
+              <h3 
+                onClick={() => {
+                  onSelectTicket(null);
+                  setModalTicket(ticket);
+                }}
+                className="text-zen-primary font-medium cursor-pointer hover:text-zen-primary/80"
+              >
+                {ticket.title}
+              </h3>
               <span className="text-xs text-zen-secondary">
                 {new Date(ticket.created_at).toLocaleDateString()}
               </span>
@@ -83,95 +91,12 @@ export default function TicketList({
 
           {/* Footer with tags and chat */}
           <div className="mt-4 flex justify-between items-end">
-            {/* Tags section */}
-            <div className="flex-1 flex flex-wrap gap-1.5">
-              {ticket.tags?.map((tag) => (
-                <span
-                  key={tag}
-                  className="flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-white/50 text-zen-secondary"
-                >
-                  {tag}
-                  {(getCurrentRole() === 'admin' || getCurrentRole() === 'agent') && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeTagFromHook(ticket.id, tag);
-                      }}
-                      className="hover:text-zen-primary"
-                    >
-                      <X size={12} />
-                    </button>
-                  )}
-                </span>
-              ))}
-              
-              {(getCurrentRole() === 'admin' || getCurrentRole() === 'agent') && (
-                showTagInput === ticket.id ? (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault();
-                    const tagToAdd = newTag.trim();
-                    if (!tagToAdd) return;
-                    
-                    // Reset error state
-                    setTagError(null);
-                    
-                    // Check tag limit in UI
-                    if ((ticket.tags || []).length >= 5) {
-                      setTagError('Maximum of 5 tags allowed');
-                      return;
-                    }
-                    
-                    // Reset UI state immediately
-                    setNewTag('');
-                    setShowTagInput(null);
-                    
-                    // Then perform the async operation
-                    const { error } = await addTagFromHook(ticket.id, tagToAdd);
-                    if (error) {
-                      setTagError(error.message);
-                      setShowTagInput(ticket.id); // Show input again on error
-                    }
-                  }} className="inline-flex relative">
-                    <input
-                      type="text"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      onBlur={() => {
-                        if (!newTag.trim()) {
-                          setShowTagInput(null);
-                          setTagError(null);
-                        }
-                      }}
-                      placeholder="Add tag..."
-                      className={`w-24 px-2 py-0.5 text-xs rounded-md border focus:outline-none focus:border-zen-primary ${
-                        tagError ? 'border-red-300' : 'border-zen-border/50'
-                      }`}
-                      autoFocus
-                      maxLength={15}
-                    />
-                    {tagError && (
-                      <div className="absolute left-0 -bottom-6 text-xs text-red-500 whitespace-nowrap">
-                        {tagError}
-                      </div>
-                    )}
-                  </form>
-                ) : (
-                  (ticket.tags || []).length < 5 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowTagInput(ticket.id);
-                        setTagError(null);
-                      }}
-                      className="flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-white/50 text-zen-secondary hover:text-zen-primary"
-                    >
-                      <Plus size={12} />
-                      Add Tag
-                    </button>
-                  )
-                )
-              )}
-            </div>
+            <TicketTags
+              ticketId={ticket.id}
+              initialTags={ticket.tags || []}
+              onAddTag={addTagFromHook}
+              onRemoveTag={removeTagFromHook}
+            />
 
             {/* Chat button */}
             <button
@@ -202,6 +127,18 @@ export default function TicketList({
           )}
         </div>
       ))}
+
+      {modalTicket && (
+        <TicketModal
+          ticket={modalTicket}
+          isOpen={!!modalTicket}
+          onClose={() => setModalTicket(null)}
+          onDeleteTicket={onDeleteTicket}
+          canDeleteTicket={canDeleteTicket(modalTicket)}
+          addTag={addTagFromHook}
+          removeTag={removeTagFromHook}
+        />
+      )}
     </div>
   );
 }

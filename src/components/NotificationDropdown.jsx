@@ -8,17 +8,17 @@ import { X, Bell, CheckCircle, Loader } from 'lucide-react';
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { notifications, unreadCount, isLoading, markAsRead } = useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, clearAll } = useNotifications();
   useDropdown(dropdownRef, () => setIsOpen(false));
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 text-zen-secondary hover:text-zen-primary relative"
+        className="p-2 text-zen-primary hover:text-zen-hover relative"
         aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
       >
-        <Bell size={24} />
+        <Bell size={26} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-zen-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount}
@@ -86,6 +86,16 @@ export default function NotificationDropdown() {
               ))
             )}
           </div>
+          {notifications.length > 0 && (
+            <div className="p-3 border-t border-zen-border/30">
+              <button
+                onClick={() => clearAll()}
+                className="w-full text-sm text-zen-secondary hover:text-zen-primary transition-colors"
+              >
+                Clear All Notifications
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

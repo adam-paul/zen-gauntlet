@@ -50,10 +50,22 @@ export function useNotifications() {
     }
   };
 
+  // Clear all notifications
+  const clearAll = async () => {
+    if (!session?.user?.id) return;
+    
+    const { error } = await notificationService.clearAllNotifications(session.user.id);
+    if (!error) {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  };
+
   return {
     notifications,
     unreadCount,
     isLoading,
-    markAsRead
+    markAsRead,
+    clearAll
   };
 }

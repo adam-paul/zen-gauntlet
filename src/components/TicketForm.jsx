@@ -6,11 +6,6 @@ import { useTickets } from "../hooks/useTickets";
 import { useEscapeKey } from "../utils/EventHandlers";
 import TagInput from "./TagInput";
 
-/**
- * Merged TicketForm component that combines the button
- * and the modal. Replaces the separate CreateTicketModal.
- * Logic and UI remain unchanged.
- */
 export default function TicketForm({ organizationId }) {
   const [showModal, setShowModal] = useState(false);
 

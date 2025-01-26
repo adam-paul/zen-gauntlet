@@ -3,8 +3,7 @@
 import { useRef, useState } from 'react';
 import { useDropdown } from '../utils/EventHandlers';
 import { useAuth } from '../hooks/useAuth';
-
-const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666666'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
+import { UserCircle } from 'lucide-react';
 
 export default function ProfileDropdown() {
   const { profile, getCurrentRole } = useAuth();
@@ -13,20 +12,26 @@ export default function ProfileDropdown() {
   useDropdown(dropdownRef, () => setIsOpen(false));
 
   const role = getCurrentRole();
-  const avatarUrl = profile?.avatar_url || DEFAULT_AVATAR;
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 rounded-full overflow-hidden border-2 border-zen-primary hover:border-zen-hover"
+        className="w-10 h-10 rounded-full overflow-hidden border-zen-primary hover:border-zen-hover flex items-center justify-center"
       >
-        <img 
-          src={avatarUrl} 
-          alt="Profile" 
-          className="w-full h-full object-cover"
-          onError={(e) => e.target.src = DEFAULT_AVATAR}
-        />
+        {profile?.avatar_url ? (
+          <img 
+            src={profile.avatar_url} 
+            alt="Profile" 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.classList.add('bg-white');
+            }}
+          />
+        ) : (
+          <UserCircle className="w-8 h-8 text-zen-primary" />
+        )}
       </button>
 
       {isOpen && (

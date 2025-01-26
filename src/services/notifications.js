@@ -35,5 +35,13 @@ export const notificationService = {
         filter: `user_id=eq.${userId}`
       }, callback)
       .subscribe();
+  },
+
+  // Clear all notifications for a user
+  clearAllNotifications(userId) {
+    return supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', userId);
   }
 };

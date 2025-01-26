@@ -15,7 +15,7 @@ export default function NotificationDropdown() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 text-zen-primary hover:text-zen-hover relative"
+        className="p-2 px-1 text-zen-primary hover:text-zen-hover relative"
         aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
       >
         <Bell size={26} />

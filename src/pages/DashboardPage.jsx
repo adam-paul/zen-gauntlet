@@ -42,6 +42,7 @@ export default function DashboardPage() {
         fetchAvailableOrgs={fetchAvailableOrgs}
         createOrganization={createOrganization}
         joinOrganization={joinOrganization}
+        isLoading={isLoading}
       />
       
       <div className="flex flex-1 overflow-hidden">

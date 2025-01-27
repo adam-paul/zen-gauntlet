@@ -10,6 +10,7 @@ const VALID_STATUSES = ['open', 'in_progress', 'resolved', 'closed'];
 export function useTickets(organizationId) {
   const [tickets, setTickets] = useState([]);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { session, getCurrentRole } = useAuth();
 
   async function fetchTickets() {
@@ -20,6 +21,7 @@ export function useTickets(organizationId) {
 
     try {
       setError(null);
+      setIsLoading(true);
       
       const { data, error: fetchError } = await supabase
         .from('tickets')
@@ -32,7 +34,9 @@ export function useTickets(organizationId) {
     } catch (err) {
       console.error('Error fetching tickets:', err);
       setError(err.message);
-    } 
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -427,6 +431,7 @@ export function useTickets(organizationId) {
   return {
     tickets,
     error,
+    isLoading,
     createTicket,
     deleteTicket,
     updateTicketStatus,

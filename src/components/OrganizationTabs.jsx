@@ -15,6 +15,7 @@ export default function OrganizationTabs({
   fetchAvailableOrgs,
   createOrganization,
   joinOrganization,
+  isLoading = false,
 }) {
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -30,10 +31,13 @@ export default function OrganizationTabs({
         {memberships.map(m => (
           <button
             key={m.organization.id}
-            onClick={() => setCurrentOrganizationId(m.organization.id)}
-            className={`px-3 py-1 rounded-md text-sm ${
+            onClick={() => !isLoading && setCurrentOrganizationId(m.organization.id)}
+            disabled={isLoading}
+            className={`px-3 py-1 rounded-md text-sm transition-colors ${
               selectedOrg?.id === m.organization.id
                 ? 'bg-zen-primary text-white'
+                : isLoading
+                ? 'bg-zen-bg text-zen-secondary/50 cursor-not-allowed'
                 : 'bg-zen-bg text-zen-secondary hover:bg-zen-border/30'
             }`}
           >
@@ -44,8 +48,13 @@ export default function OrganizationTabs({
         {/* "New Org" button + dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setShowOrgDropdown(!showOrgDropdown)}
-            className="px-3 py-1 text-sm bg-zen-primary text-white rounded-md hover:bg-zen-hover flex items-center gap-1"
+            onClick={() => !isLoading && setShowOrgDropdown(!showOrgDropdown)}
+            disabled={isLoading}
+            className={`px-3 py-1 text-sm rounded-md flex items-center gap-1 transition-colors ${
+              isLoading
+                ? 'bg-zen-primary/50 text-white/70 cursor-not-allowed'
+                : 'bg-zen-primary text-white hover:bg-zen-hover'
+            }`}
           >
             <Plus size={14} />
             New Org

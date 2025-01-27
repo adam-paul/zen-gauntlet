@@ -17,8 +17,8 @@ export default function DashboardBody({
   removeTag
 }) {
   return (
-    <main className={`transition-all duration-300 ${selectedTicket ? 'pr-96' : ''}`}>
-      <div className="max-w-6xl mx-auto p-6">
+    <main className={`flex-1 overflow-auto ${selectedTicket ? 'pr-96' : ''}`}>
+      <div className="max-w-6xl p-6">
         {!selectedOrg ? (
           <div className="text-center py-12 bg-white/80 border border-zen-border/30">
             <h2 className="text-xl text-zen-secondary">
@@ -27,7 +27,9 @@ export default function DashboardBody({
           </div>
         ) : (
           <>
-            <TicketForm organizationId={selectedOrg.id} />
+            <div className="flex">
+              <TicketForm organizationId={selectedOrg.id} />
+            </div>
             <div className="mt-8">
               {isLoading ? (
                 <div className="text-center py-12">

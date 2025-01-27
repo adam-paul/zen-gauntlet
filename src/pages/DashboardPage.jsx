@@ -6,6 +6,7 @@ import { useOrganization } from '../hooks/useOrganization';
 import { useTickets } from '../hooks/useTickets';
 import DashboardHeader from '../components/DashboardHeader';
 import DashboardBody from '../components/DashboardBody';
+import Sidebar from '../components/Sidebar';
 
 export default function DashboardPage() {
   // Auth hook
@@ -31,7 +32,7 @@ export default function DashboardPage() {
   } = useOrganization();
 
   return (
-    <div className="min-h-screen bg-zen-bg">
+    <div className="min-h-screen flex flex-col bg-zen-bg">
       <DashboardHeader
         signOut={signOut}
         memberships={memberships}
@@ -42,17 +43,20 @@ export default function DashboardPage() {
         createOrganization={createOrganization}
         joinOrganization={joinOrganization}
       />
-
-      <DashboardBody
-        selectedOrg={selectedOrg}
-        isLoading={isLoading}
-        tickets={tickets}
-        selectedTicket={selectedTicket}
-        onSelectTicket={setSelectedTicket}
-        onDeleteTicket={deleteTicket}
-        addTag={addTag}
-        removeTag={removeTag}
-      />
+      
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <DashboardBody
+          selectedOrg={selectedOrg}
+          isLoading={isLoading}
+          tickets={tickets}
+          selectedTicket={selectedTicket}
+          onSelectTicket={setSelectedTicket}
+          onDeleteTicket={deleteTicket}
+          addTag={addTag}
+          removeTag={removeTag}
+        />
+      </div>
     </div>
   );
 }

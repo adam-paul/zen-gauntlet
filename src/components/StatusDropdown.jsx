@@ -13,7 +13,6 @@ const STATUS_COLORS = {
 
 export default function StatusDropdown({ ticketId, currentStatus, organizationId }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [localStatus, setLocalStatus] = useState(currentStatus);
   const dropdownRef = useRef(null);
@@ -37,11 +36,8 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
     );
   }
 
-  const handleStatusChange = async (newStatus) => {
-    if (isUpdating) return; // Prevent concurrent updates
-    
+  const handleStatusChange = async (newStatus) => {    
     setError(null);
-    setIsUpdating(true);
     setLocalStatus(newStatus); // Optimistic update
 
     try {
@@ -52,19 +48,15 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
       console.error('Failed to update status:', err);
       setError(err.message);
       setLocalStatus(currentStatus); // Rollback on error
-    } finally {
-      setIsUpdating(false);
     }
   };
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => !isUpdating && setIsOpen(!isOpen)}
-        disabled={isUpdating}
+        onClick={() => setIsOpen(!isOpen)}
         className={`
           flex items-center gap-1 px-2 py-1 text-xs rounded-md uppercase transition-colors
-          ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${STATUS_COLORS[localStatus] || STATUS_COLORS.open}
         `}
       >
@@ -84,11 +76,9 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
             <button
               key={status}
               onClick={() => handleStatusChange(status)}
-              disabled={isUpdating}
               className={`
                 w-full px-3 py-2 text-left text-xs uppercase transition-colors
                 ${status === localStatus ? STATUS_COLORS[status] : 'hover:bg-zen-bg'}
-                ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}
               `}
             >
               {status}

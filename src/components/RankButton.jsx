@@ -33,7 +33,7 @@ export default function RankButton({ ticketId, currentDifficulty, organizationId
             px-2 py-1 text-xs rounded-md transition-colors duration-100 whitespace-nowrap
             ${currentDifficulty === difficulty 
               ? DIFFICULTY_COLORS[difficulty]
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-zen-bg text-zen-text hover:bg-gray-200'
             }
           `}
         >

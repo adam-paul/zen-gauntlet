@@ -18,7 +18,7 @@ export default function DashboardBody({
 }) {
   return (
     <main className={`flex-1 overflow-auto ${selectedTicket ? 'pr-96' : ''}`}>
-      <div className="max-w-6xl p-6">
+      <div className="p-6">
         {!selectedOrg ? (
           <div className="text-center py-12 bg-white/80 border border-zen-border/30">
             <h2 className="text-xl text-zen-secondary">

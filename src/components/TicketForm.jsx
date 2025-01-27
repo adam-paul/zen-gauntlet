@@ -54,7 +54,7 @@ export default function TicketForm({ organizationId }) {
           onClick={() => setShowModal(false)}
         >
           <div
-            className="bg-zen-bg w-[600px] rounded-lg shadow-xl relative"
+            className="bg-zen-bg w-[600px] shadow-xl relative border border-zen-border"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

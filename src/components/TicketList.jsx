@@ -39,7 +39,7 @@ export default function TicketList({
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-min">
       {tickets.map(ticket => (
-        <div key={ticket.id} className="bg-zen-bg p-6 border border-zen-border/30 relative flex flex-col min-h-[200px]">
+        <div key={ticket.id} className="p-6 border border-zen-border relative flex flex-col min-h-[200px] bg-[#f7f6f3]">
           {canDeleteTicket(ticket) && (
             <button
               onClick={() => onDeleteTicket(ticket.id)}

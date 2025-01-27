@@ -64,7 +64,7 @@ export default function TicketTags({
       {localTags.map((tag) => (
         <span
           key={tag}
-          className="flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-white/50 text-zen-secondary"
+          className="flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-zen-bg text-zen-secondary"
         >
           {tag}
           {(currentRole === 'admin' || currentRole === 'agent') && (
@@ -115,7 +115,7 @@ export default function TicketTags({
                 setShowTagInput(true);
                 setTagError(null);
               }}
-              className="flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-white/50 text-zen-secondary hover:text-zen-primary"
+              className="flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-zen-bg text-zen-secondary hover:text-zen-primary"
             >
               <Plus size={12} />
               Add Tag

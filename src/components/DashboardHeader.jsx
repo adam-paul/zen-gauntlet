@@ -18,10 +18,15 @@ export default function DashboardHeader({
   joinOrganization
 }) {
   return (
-    <header className="w-full p-6 border-b border-zen-border/30">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <div className="flex items-center gap-6">
+    <header className="w-full border-b border-zen-border/30">
+      <div className="flex">
+        {/* Logo section - width matches sidebar */}
+        <div className="w-64 p-6 flex items-center justify-center border-r border-zen-border/30">
           <h1 className="text-zen-primary text-2xl font-semibold">Zen Gauntlet</h1>
+        </div>
+
+        {/* Main header content */}
+        <div className="flex-1 px-6 py-6 flex justify-between items-center">
           <OrganizationTabs
             memberships={memberships}
             selectedOrg={selectedOrg}
@@ -31,16 +36,17 @@ export default function DashboardHeader({
             createOrganization={createOrganization}
             joinOrganization={joinOrganization}
           />
-        </div>
-        <div className="flex items-center gap-4">
-          <NotificationDropdown />
-          <ProfileDropdown />
-          <button
-            onClick={signOut}
-            className="px-4 py-2 bg-zen-primary text-white hover:bg-zen-hover"
-          >
-            Sign Out
-          </button>
+          
+          <div className="flex items-center gap-4">
+            <NotificationDropdown />
+            <ProfileDropdown />
+            <button
+              onClick={signOut}
+              className="px-4 py-2 bg-zen-primary text-white hover:bg-zen-hover"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
     </header>

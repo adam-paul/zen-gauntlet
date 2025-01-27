@@ -52,7 +52,7 @@ export default function OrganizationTabs({
             <ChevronDown size={14} />
           </button>
           {showOrgDropdown && (
-            <div className="absolute left-0 mt-1 w-48 bg-white border border-zen-border/30 rounded-md shadow-lg z-10">
+            <div className="absolute left-0 mt-1 w-48 bg-zen-element border border-zen-border/30 rounded-md shadow-lg z-10">
               <button
                 onClick={() => {
                   setShowCreateModal(true);

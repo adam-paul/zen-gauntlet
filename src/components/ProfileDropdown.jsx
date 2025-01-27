@@ -35,7 +35,7 @@ export default function ProfileDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-zen-border/30 rounded-md shadow-lg z-20">
+        <div className="absolute right-0 mt-2 w-48 bg-zen-element border border-zen-border/30 rounded-md shadow-lg z-20">
           <div className="p-4 border-b border-zen-border/30">
             <p className="font-medium text-zen-primary">{profile?.full_name || 'User'}</p>
             <p className="text-sm text-zen-secondary capitalize">{role}</p>

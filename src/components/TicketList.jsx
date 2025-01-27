@@ -38,12 +38,12 @@ export default function TicketList({
   }
 
   const containerClass = viewMode === 'compact' 
-    ? 'flex flex-col gap-0 border border-zen-border bg-[#f7f6f3] overflow-hidden' 
+    ? 'flex flex-col gap-0 border border-zen-border bg-zen-element overflow-hidden' 
     : 'grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-min';
 
   const ticketClass = viewMode === 'compact'
-    ? 'p-4 border-b last:border-b-0 border-zen-border bg-[#f7f6f3] hover:bg-[#f0efe9] transition-colors group relative'
-    : 'p-6 border border-zen-border relative flex flex-col min-h-[200px] bg-[#f7f6f3]';
+    ? 'p-4 border-b last:border-b-0 border-zen-border bg-zen-element hover:bg-[#f0efe9] transition-colors group relative'
+    : 'p-6 border border-zen-border relative flex flex-col min-h-[200px] bg-zen-element';
 
   return (
     <div className={containerClass}>

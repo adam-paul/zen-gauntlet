@@ -71,7 +71,7 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
       )}
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-32 bg-white border border-zen-border/30 rounded-md shadow-lg z-20">
+        <div className="absolute top-full left-0 mt-1 w-32 bg-zen-element border border-zen-border/30 rounded-md shadow-lg z-20">
           {Object.keys(STATUS_COLORS).map((status) => (
             <button
               key={status}

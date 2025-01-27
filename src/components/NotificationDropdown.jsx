@@ -27,7 +27,7 @@ export default function NotificationDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-zen-border/30 rounded-md shadow-lg z-20">
+        <div className="absolute right-0 mt-2 w-80 bg-zen-element border border-zen-border/30 rounded-md shadow-lg z-20">
           <div className="p-4 border-b border-zen-border/30 flex justify-between items-center">
             <h3 className="font-medium text-zen-primary">
               Notifications {unreadCount > 0 && `(${unreadCount})`}

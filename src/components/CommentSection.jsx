@@ -26,7 +26,7 @@ export default function CommentSection({ ticket, onClose, isEmbedded = false }) 
 
   const containerClasses = isEmbedded
     ? 'flex flex-col h-full'
-    : 'fixed top-[88px] bottom-0 right-0 w-96 bg-zen-bg border-l border-zen-border/30 shadow-xl p-4 pb-2 z-10 flex flex-col';
+    : 'fixed top-[88px] bottom-0 right-0 w-96 bg-zen-element border-l border-zen-border/30 shadow-xl p-4 pb-2 z-10 flex flex-col';
 
   return (
     <div className={containerClasses}>

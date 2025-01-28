@@ -10,10 +10,8 @@ export default function CommentSection({ ticket, onClose, isEmbedded = false }) 
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
 
-  // Only add ESC handler when in sidebar mode (not embedded)
-  if (!isEmbedded) {
-    useEscapeKey(onClose);
-  }
+  // Add ESC handler for both modes
+  useEscapeKey(onClose);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +47,7 @@ export default function CommentSection({ ticket, onClose, isEmbedded = false }) 
 
       {/* Input area */}
       <div className={`mt-4 pt-4 border-t border-zen-border/30 ${isEmbedded ? 'px-4 pb-4' : ''}`}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="m-0">
           <div className="relative">
             <textarea
               value={newComment}
@@ -64,7 +62,7 @@ export default function CommentSection({ ticket, onClose, isEmbedded = false }) 
                 }
               }}
               placeholder={replyingTo ? "Write a reply..." : "Add a comment..."}
-              className={`w-full ${isEmbedded ? 'p-2' : ''} pr-10 border border-zen-border/50 rounded-md focus:outline-none focus:border-zen-primary focus:ring-1 focus:ring-zen-primary`}
+              className={`w-full ${isEmbedded ? 'p-2' : ''} pr-10 border border-zen-border/50 rounded-md focus:outline-none focus:border-zen-primary focus:ring-1 focus:ring-zen-primary block`}
               rows="3"
             />
             <button

@@ -32,8 +32,11 @@ export function useTicket(orgId) {
       })
 
     // Setup real-time subscription
+    // Create a unique channel name for the subscription (to avoid conflict with function subscriptions)
+    const channelName = `tickets-${orgId}-${Date.now()}`;
+
     const channel = supabase
-      .channel(`tickets-${orgId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {

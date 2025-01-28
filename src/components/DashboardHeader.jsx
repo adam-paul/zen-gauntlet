@@ -15,8 +15,7 @@ export default function DashboardHeader({
   availableOrgs,
   fetchAvailableOrgs,
   createOrganization,
-  joinOrganization,
-  isLoading
+  joinOrganization
 }) {
   return (
     <header className="w-full border-b border-zen-border/30">
@@ -36,7 +35,6 @@ export default function DashboardHeader({
             fetchAvailableOrgs={fetchAvailableOrgs}
             createOrganization={createOrganization}
             joinOrganization={joinOrganization}
-            isLoading={isLoading}
           />
           
           <div className="flex items-center gap-4">

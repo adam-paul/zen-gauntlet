@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useOrganization } from '../hooks/useOrganization';
-import { useTickets } from '../hooks/useTickets';
 import DashboardHeader from '../components/DashboardHeader';
 import DashboardBody from '../components/DashboardBody';
 import Sidebar from '../components/Sidebar';
@@ -12,16 +11,7 @@ export default function DashboardPage() {
   // Auth hook
   const { signOut, memberships, getCurrentOrganization, setCurrentOrganizationId } = useAuth();
   const selectedOrg = getCurrentOrganization();
-
-  // Ticket hook
-  const {
-    tickets,
-    isLoading,
-    deleteTicket,
-    addTag,
-    removeTag
-  } = useTickets(selectedOrg?.id);
-  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Organization hook
   const {
@@ -47,15 +37,9 @@ export default function DashboardPage() {
       
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <DashboardBody
-          selectedOrg={selectedOrg}
-          isLoading={isLoading}
-          tickets={tickets}
-          selectedTicket={selectedTicket}
-          onSelectTicket={setSelectedTicket}
-          onDeleteTicket={deleteTicket}
-          addTag={addTag}
-          removeTag={removeTag}
+        <DashboardBody 
+          selectedOrg={selectedOrg} 
+          onLoadingChange={setIsLoading}
         />
       </div>
     </div>

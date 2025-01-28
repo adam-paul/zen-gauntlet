@@ -14,7 +14,6 @@ export default function TicketTags({
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [tagError, setTagError] = useState(null);
-  const [localTags, setLocalTags] = useState(initialTags);
 
   const handleAddTag = async (e) => {
     e.preventDefault();
@@ -25,43 +24,34 @@ export default function TicketTags({
     setTagError(null);
     
     // Check tag limit in UI
-    if (localTags.length >= 5) {
+    if (initialTags.length >= 5) {
       setTagError('Maximum of 5 tags allowed');
       return;
     }
-    
-    // Optimistically update UI
-    setLocalTags(prev => [...prev, tagToAdd]);
     
     // Reset input state
     setNewTag('');
     setShowTagInput(false);
     
-    // Perform the async operation
-    const { error } = await onAddTag(ticketId, tagToAdd);
-    if (error) {
-      // Rollback on error
-      setLocalTags(prev => prev.filter(t => t !== tagToAdd));
+    try {
+      await onAddTag(tagToAdd);
+    } catch (error) {
       setTagError(error.message);
       setShowTagInput(true);
     }
   };
 
   const handleRemoveTag = async (tagToRemove) => {
-    // Optimistically update UI
-    setLocalTags(prev => prev.filter(t => t !== tagToRemove));
-    
-    // Perform the async operation
-    const { error } = await onRemoveTag(ticketId, tagToRemove);
-    if (error) {
-      // Rollback on error
-      setLocalTags(prev => [...prev, tagToRemove]);
+    try {
+      await onRemoveTag(tagToRemove);
+    } catch (error) {
+      console.error('Failed to remove tag:', error);
     }
   };
 
   return (
     <div className={`flex flex-wrap gap-1.5 ${className}`}>
-      {localTags.map((tag) => (
+      {initialTags.map((tag) => (
         <span
           key={tag}
           className="flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-zen-bg text-zen-secondary"
@@ -108,7 +98,7 @@ export default function TicketTags({
             )}
           </form>
         ) : (
-          (localTags.length < 5 && (
+          (initialTags.length < 5 && (
             <button
               onClick={(e) => {
                 e.stopPropagation();

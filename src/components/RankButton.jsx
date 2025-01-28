@@ -1,5 +1,5 @@
 import { useAuth } from '../hooks/useAuth';
-import { useTickets } from '../hooks/useTickets';
+import { useTicket } from '../hooks/useTicket';
 
 const DIFFICULTY_COLORS = {
   easy: 'bg-green-100 hover:bg-green-200 text-green-800',
@@ -7,17 +7,19 @@ const DIFFICULTY_COLORS = {
   hard: 'bg-red-100 hover:bg-red-200 text-red-800',
 };
 
-export default function RankButton({ ticketId, currentDifficulty, organizationId }) {
+export default function RankButton({ ticketId, currentDifficulty, organizationId, onChange }) {
   const { getCurrentRole } = useAuth();
-  const { updateDifficulty } = useTickets(organizationId);
+  const { updateDifficulty } = useTicket(organizationId);
   const currentRole = getCurrentRole();
   
   if (currentRole !== 'admin') return null;
 
   const handleDifficultyChange = async (difficulty) => {
     try {
-      const { error } = await updateDifficulty(ticketId, difficulty);
-      if (error) throw error;
+      // If clicking the same difficulty, set to null (deselect)
+      const newDifficulty = currentDifficulty === difficulty ? null : difficulty;
+      await updateDifficulty(ticketId, newDifficulty);
+      onChange?.(newDifficulty);
     } catch (err) {
       console.error('Failed to update difficulty:', err);
     }

@@ -6,8 +6,11 @@ import { useEffect } from 'react';
  */
 export function useEscapeKey(callback) {
   useEffect(() => {
+    // If no callback provided, don't add the listener
+    if (!callback) return;
+    
     const handleEsc = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && typeof callback === 'function') {
         callback();
       }
     };

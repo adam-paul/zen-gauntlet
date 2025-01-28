@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useTickets } from '../hooks/useTickets';
+import { useTicket } from '../hooks/useTicket';
 import { ChevronDown } from 'lucide-react';
 import { useDropdown } from '../utils/EventHandlers';
 
@@ -11,13 +11,13 @@ const STATUS_COLORS = {
   closed: 'bg-gray-100 hover:bg-gray-200 text-gray-800'
 };
 
-export default function StatusDropdown({ ticketId, currentStatus, organizationId }) {
+export default function StatusDropdown({ ticketId, currentStatus, organizationId, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState(null);
   const [localStatus, setLocalStatus] = useState(currentStatus);
   const dropdownRef = useRef(null);
   const { getCurrentRole } = useAuth();
-  const { updateTicketStatus } = useTickets(organizationId);
+  const { updateStatus } = useTicket(organizationId);
   const currentRole = getCurrentRole();
 
   useDropdown(dropdownRef, () => setIsOpen(false));
@@ -41,9 +41,9 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
     setLocalStatus(newStatus); // Optimistic update
 
     try {
-      const { error } = await updateTicketStatus(ticketId, newStatus);
-      if (error) throw error;
+      await updateStatus(ticketId, newStatus);
       setIsOpen(false);
+      onChange?.(newStatus);
     } catch (err) {
       console.error('Failed to update status:', err);
       setError(err.message);

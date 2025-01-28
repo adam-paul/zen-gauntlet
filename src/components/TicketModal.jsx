@@ -20,8 +20,7 @@ export default function TicketModal({
 
   useEscapeKey(onClose)
   const { tickets } = useTickets(ticket?.organization_id)
-  const updatedTicket = tickets.find((t) => t.id === ticket?.id)
-  const currentTicket = updatedTicket || ticket
+  const currentTicket = tickets.find((t) => t.id === ticket?.id) || ticket
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={onClose}>

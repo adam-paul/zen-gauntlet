@@ -64,6 +64,7 @@ export default function DashboardBody({
                   addTag={addTag}
                   removeTag={removeTag}
                   viewMode={viewMode}
+                  organizationId={selectedOrg?.id}
                 />
               )}
             </div>

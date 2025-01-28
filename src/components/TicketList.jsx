@@ -8,23 +8,32 @@ import CommentSection from './CommentSection';
 import StatusDropdown from './StatusDropdown';
 import TicketModal from './TicketModal';
 import TicketTags from './TicketTags';
+import { useTicket } from '../hooks/useTicket';
 
 export default function TicketList({ 
   selectedTicket, 
-  onSelectTicket, 
-  tickets, 
-  onDeleteTicket,
-  addTag: addTagFromHook,
-  removeTag: removeTagFromHook,
+  onSelectTicket,
+  organizationId,
   viewMode = 'default'
 }) {
   const { session, getCurrentRole } = useAuth();
   const [modalTicket, setModalTicket] = useState(null);
+  
+  const {
+    tickets,
+    isLoading,
+    deleteTicket,
+    addTag,
+    removeTag
+  } = useTicket(organizationId);
 
-  const canDeleteTicket = (ticket) => {
-    const currentRole = getCurrentRole();
-    return currentRole === 'admin' || ticket.created_by === session?.user?.id;
-  };
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin h-8 w-8 mx-auto border-4 border-zen-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   if (!tickets?.length) {
     return (
@@ -49,9 +58,9 @@ export default function TicketList({
     <div className={containerClass}>
       {tickets.map(ticket => (
         <div key={ticket.id} className={ticketClass}>
-          {canDeleteTicket(ticket) && (
+          {ticket.canBeDeletedBy(session?.user?.id, getCurrentRole()) && (
             <button
-              onClick={() => onDeleteTicket(ticket.id)}
+              onClick={() => deleteTicket(ticket.id)}
               className={`${viewMode === 'compact' 
                 ? 'opacity-0 group-hover:opacity-100 absolute right-4 top-1/2 -translate-y-1/2 transition-opacity duration-200'
                 : 'absolute top-2 right-2'} text-zen-secondary hover:text-zen-primary transition-colors`}
@@ -77,20 +86,18 @@ export default function TicketList({
                   </h3>
                   <div className="h-5 w-px bg-zen-border/50" />
                   <p className="text-zen-secondary text-sm">
-                    {ticket.description.length > 30 
-                      ? `${ticket.description.substring(0, 30)}...`
-                      : ticket.description}
+                    {ticket.truncatedDescription}
                   </p>
                   <div className="h-5 w-px bg-zen-border/50" />
                   <span className="text-xs text-zen-secondary whitespace-nowrap">
-                    {new Date(ticket.created_at).toLocaleDateString()}
+                    {ticket.displayDate}
                   </span>
                   <div className="ml-auto group-hover:mr-6 transition-all">
                     <TicketTags
                       ticketId={ticket.id}
-                      initialTags={ticket.tags || []}
-                      onAddTag={addTagFromHook}
-                      onRemoveTag={removeTagFromHook}
+                      initialTags={ticket.tags}
+                      onAddTag={addTag}
+                      onRemoveTag={removeTag}
                     />
                   </div>
                 </>
@@ -107,7 +114,7 @@ export default function TicketList({
                       {ticket.title}
                     </h3>
                     <span className="text-xs text-zen-secondary whitespace-nowrap">
-                      {new Date(ticket.created_at).toLocaleDateString()}
+                      {ticket.displayDate}
                     </span>
                   </div>
                   <p className="text-zen-secondary text-sm mb-4 line-clamp-3">{ticket.description}</p>
@@ -136,9 +143,9 @@ export default function TicketList({
               <div className="mt-4 flex justify-between items-end">
                 <TicketTags
                   ticketId={ticket.id}
-                  initialTags={ticket.tags || []}
-                  onAddTag={addTagFromHook}
-                  onRemoveTag={removeTagFromHook}
+                  initialTags={ticket.tags}
+                  onAddTag={addTag}
+                  onRemoveTag={removeTag}
                 />
 
                 <button
@@ -177,10 +184,8 @@ export default function TicketList({
           ticket={modalTicket}
           isOpen={!!modalTicket}
           onClose={() => setModalTicket(null)}
-          onDeleteTicket={onDeleteTicket}
-          canDeleteTicket={canDeleteTicket(modalTicket)}
-          addTag={addTagFromHook}
-          removeTag={removeTagFromHook}
+          addTag={addTag}
+          removeTag={removeTag}
         />
       )}
     </div>

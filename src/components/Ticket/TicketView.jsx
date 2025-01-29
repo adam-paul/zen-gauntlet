@@ -21,31 +21,6 @@ const Modal = ({ children, onClose }) => (
   </div>
 )
 
-const StatusBadge = ({ status }) => {
-  const colors = {
-    open: 'bg-green-100 text-green-800',
-    in_progress: 'bg-blue-100 text-blue-800',
-    resolved: 'bg-purple-100 text-purple-800',
-    closed: 'bg-gray-100 text-gray-800'
-  }
-
-  return (
-    <span className={`px-2 py-1 rounded-full text-xs ${colors[status] || colors.open}`}>
-      {status.replace('_', ' ')}
-    </span>
-  )
-}
-
-const TagList = ({ tags }) => (
-  <div className="flex gap-1">
-    {tags.map(tag => (
-      <span key={tag} className="px-2 py-1 bg-zen-border/30 rounded-full text-xs text-zen-secondary">
-        {tag}
-      </span>
-    ))}
-  </div>
-)
-
 export default function TicketView({ 
   ticket, 
   view = 'default',
@@ -75,7 +50,12 @@ export default function TicketView({
               {ticket.title}
             </h3>
             <div className="h-5 w-px bg-zen-border/50" />
-            <StatusBadge status={ticket.status} />
+            <StatusDropdown
+              ticketId={ticket.id}
+              currentStatus={ticket.status}
+              organizationId={ticket.organization_id}
+              onChange={onStatusChange}
+            />
           </div>
         )
       case 'modal':
@@ -121,20 +101,20 @@ export default function TicketView({
   }, [view, ticket, onStatusChange, onDifficultyChange, onOpenModal])
 
   const renderTags = useCallback(() => {
+    const commonProps = {
+      ticketId: ticket.id,
+      initialTags: ticket.tags,
+      onAddTag,
+      onRemoveTag
+    };
+
     switch (view) {
       case 'compact':
-        return <TagList tags={ticket.tags} />
+        return <TicketTags {...commonProps} className="min-w-[150px]" />;
       default:
-        return (
-          <TicketTags
-            ticketId={ticket.id}
-            initialTags={ticket.tags}
-            onAddTag={onAddTag}
-            onRemoveTag={onRemoveTag}
-          />
-        )
+        return <TicketTags {...commonProps} />;
     }
-  }, [view, ticket, onAddTag, onRemoveTag])
+  }, [view, ticket, onAddTag, onRemoveTag]);
 
   // View-specific wrappers
   switch (view) {

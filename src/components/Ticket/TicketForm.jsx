@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import { useEscapeKey } from "../utils/EventHandlers";
-import { useTicket } from "../hooks/useTicket";
-import { useAuth } from "../hooks/useAuth";
-import TagInput from "./TagInput";
+import { useEscapeKey } from "../../utils/EventHandlers";
+import { useTicket } from "../../hooks/useTicket";
+import { useAuth } from "../../hooks/useAuth";
+import TagInput from "../TagInput";
 
 export default function TicketForm({ organizationId, onClose }) {
   const { session } = useAuth();

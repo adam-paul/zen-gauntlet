@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { LayoutGrid, LayoutList, PlusSquare, Inbox, X } from 'lucide-react'
 import { useTicket } from '../../hooks/useTicket'
 import TicketView from './TicketView'
-import TicketForm from '../TicketForm'
+import TicketForm from './TicketForm'
 import CommentSection from '../CommentSection'
 
 // Header component with view toggle and new ticket button

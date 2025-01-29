@@ -33,7 +33,7 @@ function AuthStateManager({ children }) {
       .from('user_organization_memberships')
       .select('*, organization:organizations(*)')
       .eq('user_id', session.user.id)
-      .order('created_at', { ascending: false });
+      .order('organization(name)', { ascending: true });
   
     setAuthMemberships(memberships || []);
     setProfile(existingProfile);

@@ -4,15 +4,12 @@ import { useEscapeKey } from '../utils/EventHandlers';
 
 export default function OrganizationModal({
   mode = 'create',
-  isOpen,
   onClose,
   onSubmit,
   availableOrgs = [],
 }) {
   const [newOrgName, setNewOrgName] = useState('');
   useEscapeKey(onClose);
-
-  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

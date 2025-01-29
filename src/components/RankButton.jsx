@@ -1,11 +1,6 @@
 import { useAuth } from '../hooks/useAuth';
 import { useTicket } from '../hooks/useTicket';
-
-const DIFFICULTY_COLORS = {
-  easy: 'bg-green-100 hover:bg-green-200 text-green-800',
-  moderate: 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800',
-  hard: 'bg-red-100 hover:bg-red-200 text-red-800',
-};
+import { DIFFICULTY_COLORS, DIFFICULTY_LEVELS } from '../utils/constants';
 
 export default function RankButton({ ticketId, currentDifficulty, organizationId, onChange }) {
   const { getCurrentRole } = useAuth();
@@ -27,7 +22,7 @@ export default function RankButton({ ticketId, currentDifficulty, organizationId
 
   return (
     <div className="flex gap-1" style={{ minHeight: '28px' }}>
-      {['easy', 'moderate', 'hard'].map((difficulty) => (
+      {DIFFICULTY_LEVELS.map((difficulty) => (
         <button
           key={difficulty}
           onClick={() => handleDifficultyChange(difficulty)}

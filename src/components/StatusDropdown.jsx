@@ -3,15 +3,15 @@ import { useAuth } from '../hooks/useAuth';
 import { useTicket } from '../hooks/useTicket';
 import { ChevronDown } from 'lucide-react';
 import { useDropdown } from '../utils/EventHandlers';
+import { STATUS_COLORS, STATUS_COLORS_STATIC, TICKET_STATUSES } from '../utils/constants';
 
-const STATUS_COLORS = {
-  open: 'bg-blue-100 hover:bg-blue-200 text-blue-800',
-  in_progress: 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800',
-  resolved: 'bg-green-100 hover:bg-green-200 text-green-800',
-  closed: 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-};
-
-export default function StatusDropdown({ ticketId, currentStatus, organizationId, onChange }) {
+export default function StatusDropdown({ 
+  ticketId, 
+  currentStatus, 
+  organizationId, 
+  onChange,
+  className = '' // Add className prop for flexible positioning
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState(null);
   const [localStatus, setLocalStatus] = useState(currentStatus);
@@ -27,10 +27,10 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
     setLocalStatus(currentStatus);
   }, [currentStatus]);
 
-  // If not admin/agent, just show the status text
-  if (!currentRole || !['admin', 'agent'].includes(currentRole)) {
+  // If not admin/agent, or if no ticketId provided, just show the status text
+  if (!ticketId || !currentRole || !['admin', 'agent'].includes(currentRole)) {
     return (
-      <span className={`px-2 py-1 text-xs rounded-md uppercase ${STATUS_COLORS[localStatus] || STATUS_COLORS.open}`}>
+      <span className={`px-2 py-1 text-xs rounded-md uppercase ${STATUS_COLORS_STATIC[localStatus] || STATUS_COLORS_STATIC.open} ${className}`}>
         {localStatus || 'open'}
       </span>
     );
@@ -52,7 +52,7 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`
@@ -72,7 +72,7 @@ export default function StatusDropdown({ ticketId, currentStatus, organizationId
 
       {isOpen && (
         <div className="absolute top-full left-0 mt-1 w-32 bg-zen-element border border-zen-border/30 rounded-md shadow-lg z-20">
-          {Object.keys(STATUS_COLORS).map((status) => (
+          {TICKET_STATUSES.map((status) => (
             <button
               key={status}
               onClick={() => handleStatusChange(status)}

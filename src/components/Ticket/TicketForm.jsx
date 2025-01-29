@@ -33,6 +33,7 @@ export default function TicketForm({ organizationId, onClose }) {
     try {
       await createTicket({
         ...formData,
+        organization_id: organizationId,
         created_by: session?.user?.id
       });
       setFormData({ title: "", description: "", tags: [] });

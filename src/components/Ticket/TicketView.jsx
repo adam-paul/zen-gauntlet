@@ -4,7 +4,9 @@ import StatusDropdown from '../StatusDropdown'
 import RankButton from '../RankButton'
 import TicketTags from '../TicketTags'
 import CommentSection from '../CommentSection'
+import AssigneeDisplay from '../AssigneeDisplay'
 import { useEscapeKey } from '../../utils/EventHandlers'
+import { formatTimeAgo } from '../../utils/DatetimeUtils'
 
 // Shared components
 const Card = ({ children, className = '' }) => (
@@ -62,9 +64,12 @@ export default function TicketView({
         return (
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
-              <h2 className="text-2xl font-semibold text-zen-primary">{ticket.title}</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-semibold text-zen-primary">{ticket.title}</h2>
+                <AssigneeDisplay userId={ticket.assigned_to} />
+              </div>
               <p className="text-sm text-zen-secondary mt-2">
-                Created {ticket.displayDate}
+                Created {ticket.displayDate} ({formatTimeAgo(ticket.created_at)})
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -206,6 +211,7 @@ export default function TicketView({
                 organizationId={ticket.organization_id}
                 onChange={onStatusChange}
               />
+              <AssigneeDisplay userId={ticket.assigned_to} />
             </div>
           </div>
           <div className="mt-4 flex justify-between items-end">

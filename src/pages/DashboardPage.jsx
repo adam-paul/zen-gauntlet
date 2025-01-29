@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const { signOut, memberships, getCurrentOrganization, setCurrentOrganizationId } = useAuth();
   const selectedOrg = getCurrentOrganization();
   const [isLoading, setIsLoading] = useState(false);
+  const [activeSection, setActiveSection] = useState('tickets');
 
   // Organization hook
   const {
@@ -36,10 +37,14 @@ export default function DashboardPage() {
       />
       
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
+        <Sidebar 
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+        />
         <DashboardBody 
           selectedOrg={selectedOrg} 
           onLoadingChange={setIsLoading}
+          activeSection={activeSection}
         />
       </div>
     </div>

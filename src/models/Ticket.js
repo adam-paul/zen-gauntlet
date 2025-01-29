@@ -8,6 +8,7 @@ class Ticket {
     this.title = data.title
     this.description = data.description
     this.status = data.status || 'open'
+    this.assigned_to = data.assigned_to || null
     this.difficulty = data.difficulty
     this.tags = data.tags || []
     this.created_at = data.created_at
@@ -41,7 +42,8 @@ class Ticket {
       difficulty: this.difficulty,
       tags: [...this.tags],
       created_at: this.created_at,
-      created_by: this.created_by
+      created_by: this.created_by,
+      assigned_to: this.assigned_to
     }
   }
 }

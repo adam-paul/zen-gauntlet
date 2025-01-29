@@ -91,13 +91,24 @@ export function useTicket(orgId) {
 
   // CRUD operations with optimistic updates
   const createTicket = async (data) => {
-    const ticketData = {
-      ...data,
-      organization_id: orgId,
-      created_at: new Date().toISOString()
-    }
-
     try {
+      // Get the admin's UUID for this organization
+      const { data: adminData, error: adminError } = await supabase
+        .from('user_organization_memberships')
+        .select('user_id')
+        .eq('organization_id', orgId)
+        .eq('user_role', 'admin')
+        .single()
+
+      if (adminError) throw adminError
+
+      const ticketData = {
+        ...data,
+        organization_id: orgId,
+        created_at: new Date().toISOString(),
+        assigned_to: adminData.user_id
+      }
+
       const { data: newTicket, error } = await supabase
         .from('tickets')
         .insert(ticketData)
@@ -110,6 +121,7 @@ export function useTicket(orgId) {
       setTickets(prev => [ticket, ...prev])
       return ticket
     } catch (err) {
+      console.error('Failed to create ticket:', err)
       throw err
     }
   }

@@ -3,7 +3,6 @@ import { X, Plus } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function TicketTags({ 
-  ticketId, 
   initialTags = [], 
   onAddTag, 
   onRemoveTag,

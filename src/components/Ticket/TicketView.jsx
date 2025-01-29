@@ -22,7 +22,7 @@ const Modal = ({ children, onClose }) => (
 )
 
 export default function TicketView({ 
-  ticket, 
+  ticket,
   view = 'default',
   onOpenModal,
   onClose,

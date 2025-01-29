@@ -191,7 +191,7 @@ export default function TicketDashboard({
 
       {modalTicket && (
         <TicketView
-          ticket={modalTicket}
+          ticket={tickets.find(t => t.id === modalTicket.id) || modalTicket}
           view="modal"
           onClose={() => setModalTicket(null)}
           onStatusChange={(status) => updateStatus(modalTicket.id, status)}

@@ -39,15 +39,16 @@ export default function StatusDropdown({
   const handleStatusChange = async (newStatus) => {    
     setError(null);
     setLocalStatus(newStatus); // Optimistic update
+    setIsOpen(false); // Close dropdown immediately
 
     try {
       await updateStatus(ticketId, newStatus);
-      setIsOpen(false);
       onChange?.(newStatus);
     } catch (err) {
       console.error('Failed to update status:', err);
       setError(err.message);
       setLocalStatus(currentStatus); // Rollback on error
+      setIsOpen(false); // Ensure dropdown is closed even on error
     }
   };
 

@@ -10,16 +10,6 @@ export default function DashboardBody({ selectedOrg, onLoadingChange, activeSect
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [viewMode, setViewMode] = useState('default');
 
-  if (!selectedOrg) {
-    return (
-      <div className="text-center py-12 bg-white/80 border border-zen-border/30">
-        <h2 className="text-xl text-zen-secondary">
-          Select an organization to view dashboard
-        </h2>
-      </div>
-    );
-  }
-
   // Render appropriate content based on active section
   if (activeSection !== 'tickets') {
     return (
@@ -41,7 +31,7 @@ export default function DashboardBody({ selectedOrg, onLoadingChange, activeSect
     <main className="flex-1 overflow-hidden flex flex-col">
       <div className="flex-1 overflow-hidden p-6">
         <TicketDashboard
-          organizationId={selectedOrg.id}
+          organizationId={selectedOrg?.id}
           selectedTicket={selectedTicket}
           onSelectTicket={setSelectedTicket}
           viewMode={viewMode}

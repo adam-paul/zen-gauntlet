@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { LayoutGrid, LayoutList, PlusSquare, Inbox, X } from 'lucide-react'
+import { LayoutGrid, LayoutList, PlusSquare, Inbox, Building, X } from 'lucide-react'
 import { useTicket } from '../../hooks/useTicket'
 import TicketView from './TicketView'
 import TicketForm from './TicketForm'
@@ -70,6 +70,18 @@ function EmptyState() {
   )
 }
 
+// Organization selection state component
+function OrgSelectionState() {
+  return (
+    <div className="text-center py-12">
+      <Building className="mx-auto text-zen-primary/70 mb-4" size={48} />
+      <p className="text-zen-secondary">
+        Select an organization to view dashboard
+      </p>
+    </div>
+  )
+}
+
 export default function TicketDashboard({ 
   organizationId,
   selectedTicket,
@@ -105,8 +117,12 @@ export default function TicketDashboard({
     ? 'flex flex-col gap-0 border border-zen-border bg-zen-element overflow-hidden'
     : 'grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-min'
 
+  if (!organizationId) {
+    return <OrgSelectionState />;
+  }
+
   if (isLoading) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -114,7 +130,7 @@ export default function TicketDashboard({
       <div className="text-center py-12 text-red-600">
         Error loading tickets: {error}
       </div>
-    )
+    );
   }
 
   return (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import TicketDashboard from './Ticket/TicketDashboard';
+import AgentDashboard from './Agents/AgentDashboard';
 
 /**
  * Handles the main content of the dashboard:
@@ -11,6 +12,16 @@ export default function DashboardBody({ selectedOrg, onLoadingChange, activeSect
   const [viewMode, setViewMode] = useState('default');
 
   // Render appropriate content based on active section
+  if (activeSection === 'agents') {
+    return (
+      <main className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-hidden">
+          <AgentDashboard />
+        </div>
+      </main>
+    );
+  }
+
   if (activeSection !== 'tickets') {
     return (
       <main className="flex-1 overflow-hidden flex flex-col">

@@ -11,12 +11,21 @@ export default function DashboardBody({ selectedOrg, onLoadingChange, activeSect
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [viewMode, setViewMode] = useState('default');
 
+  // If no organization is selected, show a message
+  if (!selectedOrg) {
+    return (
+      <main className="flex-1 overflow-hidden flex items-center justify-center">
+        <p className="text-zen-secondary">Please select an organization</p>
+      </main>
+    );
+  }
+
   // Render appropriate content based on active section
   if (activeSection === 'agents') {
     return (
       <main className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-hidden">
-          <AgentDashboard />
+          <AgentDashboard organization={selectedOrg} />
         </div>
       </main>
     );

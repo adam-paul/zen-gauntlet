@@ -1,6 +1,7 @@
 // src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { Toaster } from 'react-hot-toast';
 import LoginPage from './pages/LoginPage';
 import ConfirmPage from './pages/ConfirmPage';
 import DashboardPage from './pages/DashboardPage';
@@ -31,6 +32,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" />
       <AppRoutes />
     </AuthProvider>
   );

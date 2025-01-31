@@ -83,7 +83,7 @@ export default function AgentInterface({ organizationId }) {
       // Test server connectivity first
       console.log('Testing server connectivity...');
       try {
-        const healthCheck = await fetch('/health', {
+        const healthCheck = await fetch('http://localhost:8000/health', {
           method: 'GET',
           headers: { 
             'Accept': 'application/json'
@@ -117,7 +117,7 @@ export default function AgentInterface({ organizationId }) {
         }
       });
       
-      const response = await fetch('/api/agent/create-ticket', {
+      const response = await fetch('http://localhost:8000/api/agent/create-ticket', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

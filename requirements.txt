@@ -5,3 +5,4 @@ langchain
 openai
 langfuse
 pydantic
+langchain_community

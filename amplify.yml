@@ -8,13 +8,17 @@ backend:
         - python3 -m pip install virtualenv
         - python3 -m virtualenv venv
         - source venv/bin/activate
-        - pip install -r requirements.txt
+        - echo "Current directory contents:"
+        - ls -la
+        - echo "Installing requirements from requirements.txt..."
+        - if [ -f "requirements.txt" ]; then pip install -r requirements.txt; else echo "requirements.txt not found!" && exit 1; fi
         - echo "Starting FastAPI server..."
         - nohup uvicorn src.agents.api:app --host 0.0.0.0 --port 8000 &
   artifacts:
     baseDirectory: /
     files:
       - '**/*'
+      - requirements.txt
     exclude:
       - venv/**/*
       - node_modules/**/*

@@ -8,12 +8,13 @@ backend:
         - python3 -m pip install virtualenv
         - python3 -m virtualenv venv
         - source venv/bin/activate
-        - echo "Current directory contents:"
-        - ls -la
         - echo "Installing requirements from requirements.txt..."
         - if [ -f "requirements.txt" ]; then pip install -r requirements.txt; else echo "requirements.txt not found!" && exit 1; fi
+    start:
+      commands:
         - echo "Starting FastAPI server..."
-        - nohup uvicorn src.agents.api:app --host 0.0.0.0 --port 8000 &
+        - cd /opt/
+        - nohup uvicorn src.agents.api:app --host 0.0.0.0 --port 8000 --workers 4 &
   artifacts:
     baseDirectory: /
     files:
@@ -28,12 +29,10 @@ frontend:
     preBuild:
       commands:
         - npm ci --verbose
-        - npm list
     build:
       commands:
         - echo "Starting build..."
         - npm run build || { echo "Build failed"; exit 1; }
-        - echo "Build completed"
   artifacts:
     baseDirectory: dist
     files:
@@ -41,17 +40,15 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-    commands:
-      - echo "Cache paths configured"
 
-  # Add environment variables configuration
-  customHeaders:
-    - pattern: '**/*'
-      headers:
-        - key: 'Cache-Control'
-          value: 'no-cache'
-        - key: 'X-Frame-Options'
-          value: 'SAMEORIGIN'
+# Add environment variables configuration
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      - key: 'Cache-Control'
+        value: 'no-cache'
+      - key: 'X-Frame-Options'
+        value: 'SAMEORIGIN'
 
 # Add proxy configuration for the API
 proxy:
@@ -61,8 +58,8 @@ proxy:
     {
       "rewrites": [
         {
-          "source": "/api/:path*",
-          "destination": "http://localhost:8000/api/:path*"
+          "source": "/api/*",
+          "destination": "http://localhost:8000/api/:splat"
         },
         {
           "source": "/health",
